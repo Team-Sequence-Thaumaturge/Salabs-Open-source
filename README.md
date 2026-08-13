@@ -1,72 +1,55 @@
-# Sequence Autonomic Parsing & QA (SAPQ) Engine
+# Quanxs SALabs Open Source Utilities & Engines
 
-The **Sequence Autonomic Parsing & QA (SAPQ) Engine** is an advanced code integrity auditor designed to detect semantic contradictions, out-of-order execution, and incomplete mockup stubs (anti-mockup gate) in source code. 
-
-It is specifically engineered to audit LLM-generated code and autonomous multi-agent deployments, acting as a structural circuit breaker before live production push.
+Welcome to the official **SALabs Open Source Repository**. This repository contains a collection of clean, open-source developer utilities, 3D graphics rendering engines, quality control auditors, and autonomous copilot protocols developed by the Team Sequence Thaumaturge.
 
 ---
 
-## 🛡️ Core Capabilities
+## 🏛️ Repository Contents
 
-### 1. 4-Directional Interleaved Cross-Parsing
-The engine traces program trajectories by running four independent scanning vectors across the code:
-- **Phase A (Forward Def)**: Scans declarations (`const`, `let`, `function`, `id="..."` DOM anchors).
-- **Phase Z (Backward Ref)**: Scans reference usages (`document.getElementById`, method calls, object property lookups).
-- **Phase a (Skip-Forward State)**: Traces mutations and inline events (`onclick`, `onchange`, variable assignments).
-- **Phase z (Skip-Backward Event)**: Audits event loop registers (`addEventListener`, `setTimeout`, message listeners).
+### 1. 🛡️ Sequence Autonomic Parsing & QA (SAPQ) Engine (`/sapq`, `/multi_vector_parser.py`)
+An advanced code integrity auditor designed to detect semantic contradictions, out-of-order execution, and incomplete mockup stubs (anti-mockup gate) in source code.
+- **Torsion Crossing Detection**: Flags when variables, functions, or DOM IDs are referenced before their physical declaration.
+- **Ghost Node Scanner**: Identifies isolated dead variables.
+- **Anti-Mockup AST Audit**: Rejects code containing dummy/mock placeholders (e.g. `Math.random()`, incomplete timeout stubs).
+- **CLI & Web Visualizer**: Includes a CLI scanner (`python -m sapq.sapq_cli`) and a browser-based drag-and-drop HTML5 Canvas cockpit (`tools/jules-ai-qa-cross-parsing-auditor.html`).
 
-### 2. Contradiction & Bug Detection
-- **`TORSION_CROSSING` (Reverse Dependency)**: Flags when a variable, function, or DOM element is called or referenced in the execution path *before* it has been physically declared or bound.
-- **`GHOST_NODE` (Zombie Variable)**: Detects dead/isolated variables that are declared in the forward pass but never read or queried in the backward pass.
-- **`CLOSED_LOOP_ANOMALY`**: Identifies circular event triggers or unhandled event loop leaks.
+### 2. 🤖 Sequence Autonomic Control Protocol (SACP) / Sovereign CoPilot (`/sacp`)
+A clean, secure, and generic agentic copilot engine and file watcher protocol.
+- **Sovereign CoPilot Core**: Asynchronous python loop engine and local directory observer (`sacp_copilot_engine.py`, `sacp_file_watcher.py`).
+- **CoPilot Web Studio**: Beautiful interactive browser cockpit (`sacp_chat_studio.html`) and direct JSON-based chat stream configurations.
+- **WASM Bridge**: Native C++ wasm bindings (`chrome_extension/sacp_wasm_bridge.cpp`) for high-performance agent-to-browser communication.
 
-### 3. Anti-Mockup AST Validation (`MOCKUP_HALLUCINATION`)
-LLMs often "stub out" complex business logic with mock placeholders. SAPQ audits Python AST structures and Javascript files to detect:
-- Hardcoded test returns (`return true;`, `Math.random()`) in crypto, checkout, or network layers.
-- Incomplete mock callbacks (`setTimeout` dummy returns instead of actual REST API/WebCrypto bindings).
-- Stub comments (`TODO`, `FIXME`, `mock implementation`) in core production features.
+### 3. 🎨 Polyglot 3D Spatial Rendering Engine (`/polyglot_3d_engine`)
+- Modular WebGL-based Three.js rendering library (`src/`) for building high-performance 120 FPS instanced mesh 3D simulations and spatial dynamics.
 
-### 4. Windows Background Popup Vulnerability Audit
-In Windows desktop environments, background scripts spawning subprocesses without proper flags cause flashing CMD prompt windows. SAPQ automatically audits and flags any python `subprocess` or `os.system` calls lacking secure `creationflags` (like `0x08000000` / `CREATE_NO_WINDOW`).
+### 4. 🧰 420+ Pure Client-Side Utility Tools (`/tools`)
+A comprehensive bundle of single-file browser utility tools. These run 100% locally with 0 server-side dependencies:
+- **Audio utilities**: 200+ specialized audio tools (bpm metronome, binaural beats, parametric EQ, reverb convolver, granular synthethizer, voice pitch trackers).
+- **Web Design utilities**: CSS box shadow inset studio, backdrop filter generator, clip-path generator, color contrast accessibility checkers.
+- **Developer utilities**: Base64 JWT decoder, JS AST code complexity analyzer, client-side localstorage/session managers, mock API sandboxes.
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.8+
-- `requests` (for the active API prober module)
-
+### 🐍 Python Engines (SAPQ & SACP)
+Prerequisites:
 ```bash
 pip install requests
 ```
 
----
-
-## 💻 CLI Usage
-
-Audit a specific python file or an entire directory:
-
+Audit a target script using the SAPQ CLI:
 ```bash
-# Run directory-wide or file audit via CLI
-python -m sapq.sapq_cli "path/to/your/code"
+python -m sapq.sapq_cli "path/to/target"
 ```
 
-Verify a specific script using the multi-vector parser runner:
-
+Start the SACP Sovereign CoPilot observer:
 ```bash
-python multi_vector_parser.py "path/to/your/file.js"
+python -m sacp.sacp_copilot_engine --watch "path/to/watch/directory"
 ```
 
----
-
-## 🎨 Interactive Web Visualizer
-
-If you prefer a visual interface, SAPQ includes a lightweight, 100% client-side HTML5 Canvas cockpit:
-
-1. Open `tools/jules-ai-qa-cross-parsing-auditor.html` in any web browser.
-2. Drag & drop or paste your source code into the editor.
-3. Click **Run Multi-Vector Audit** to see a live visual graph mapping forward declarations to backward references, highlighting torsion lines, mockups, and dead variables instantly.
+### 🌐 Web Tools
+To use any of the 420+ browser utilities (including the SAPQ Code Auditor and SACP Chat Studio), simply open the respective `.html` file inside the `tools/` or `sacp/` directory in any modern web browser.
 
 ---
 

@@ -53,5 +53,26 @@ To use any of the 420+ browser utilities (including the SAPQ Code Auditor and SA
 
 ---
 
+## 📜 SAPQ Engine Release Patch Notes (v1.0 ➔ v3.0 Timeline)
+
+### 🟢 SAPQ v1.0 — Static AST & OS Safety Core (Phases 1 ~ 13)
+- **Subprocess Popup Flashing Audit**: Automated detection of `creationflags=0x08000000` (`CREATE_NO_WINDOW`) for Python background subprocesses to prevent Windows CMD popups.
+- **`os.system` Ban (`MOCKUP_HALLUCINATION`)**: Strictly flags `os.system` as an insecure mockup call and mandates `subprocess` usage.
+- **Script Hoisting Engine**: Automatically hoists HTML `<script>` tags to the top of `<head>` during tool unpacking.
+
+### 🔵 SAPQ v2.0 — Multi-Vector Cross-Parsing & OS Process Auditor (Phases 14 ~ 17)
+- **4-Stage Cross-Parsing Protocol**: Enforces 4-directional cross-parsing ($A\to Z, Z\to A, a\to c\to e, z\to x\to v$).
+- **`TORSION_CROSSING` & `GHOST_NODE` Detection**: Flags reverse dependency reference torsions and cleans isolated zombie variables before deployment.
+- **Bitwise Mask Check**: Supports combined flag masks `(creationflags & 0x08000000) != 0` (e.g. `0x08000008` detached processes).
+- **OS Daemon Duplication Audit**: Integrates `psutil` queries to detect background daemon duplicates and prevent memory/port collisions.
+
+### 🟣 SAPQ v3.0 — DOM-Event Relay, Cascade Graph & Agent Sandbox (Phases 18 ~ 19)
+- **DOM Target Mismatch Parser (`sapq_dom_relay.py`)**: Static DOM Event listener parsing to resolve `document.getElementById` target ID mismatches and eliminate runtime `TypeError: Cannot read properties of null` exceptions.
+- **Cascade Mutation Graph (`sapq_cascade_graph.py`)**: Multi-file Cascade Mutation Dual-Graph Engine tracking domino side-effects across module refactoring.
+- **Agent Self-Healing Sandbox (`sapq_sandbox_proxy.py`, `sapq_agent_protocol.py`)**: Isolated HTTP Proxy Sandbox providing real-time line-level error traces to AI agents (Jules/Spark/Antigravity) for 0-human self-healing code generation.
+- **Preflight Sanity & Checkpoint Logging**: `sapq_preflight.py` and `sapq_checkpoint.py` logging for 0-runtime-crash deployments.
+
+---
+
 ## 📄 License
 Licensed under the **MIT License**. Feel free to use, modify, and distribute for personal or commercial projects.

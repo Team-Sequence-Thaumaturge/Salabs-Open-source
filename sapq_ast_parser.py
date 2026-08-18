@@ -417,3 +417,4 @@ class ASTParser:
 # Backward compatibility aliases
 ASTMultiVectorParser = ASTParser
 SAPQASTParser = ASTParser
+MultiVectorCrossParsingAuditEngine = ASTParser

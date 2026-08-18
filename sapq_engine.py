@@ -194,20 +194,14 @@ class SAPQEngine:
             "discontinuities_detected": discontinuities[:10],
             "zombie_nodes_detected": zombie_nodes[:10],
             "event_target_mismatches": event_target_mismatches[:10],
-<<<<<<< HEAD
             "scope_undeclared_symbols": scope_undeclared_symbols[:10],
             "closed_loop_warnings": closed_loops
-=======
-            "closed_loop_warnings": closed_loops,
-            "scope_undeclared_symbols": scope_undeclared_symbols
->>>>>>> origin/jules-sapq-fixes-9574348619862130371
         }
 
         return report
 
 try:
     from .sapq_baseline_cube import SAPQBaselineCube
-<<<<<<< HEAD
     from .sapq_llm_auditor import DualLLMAuditor
     from .sapq_interlock import SAPQInterlock
     from .sapq_anti_mockup import AntiMockupDepthEngine
@@ -225,16 +219,6 @@ except (ImportError, ValueError):
 def audit_file(filepath, session_id=None, baseline_filepath=None, audit_only=False):
     checkpoint_mgr = CheckpointManager(filepath, session_id=session_id)
     logger = SAPQLogger(filepath, session_id=checkpoint_mgr.session_id)
-=======
-    from .sapq_dom_relay import SAPQDOMRelay
-except (ImportError, ValueError):
-    from sapq_baseline_cube import SAPQBaselineCube
-    from sapq_dom_relay import SAPQDOMRelay
-
-def audit_file(filepath, session_id=None, baseline_filepath=None, audit_only=False):
-    checkpoint_mgr = CheckpointManager(filepath, session_id=session_id, audit_only=audit_only)
-    logger = SAPQLogger(filepath, session_id=checkpoint_mgr.session_id, audit_only=audit_only)
->>>>>>> origin/jules-sapq-fixes-9574348619862130371
 
     logger.log_session_start()
 
@@ -290,7 +274,6 @@ def audit_file(filepath, session_id=None, baseline_filepath=None, audit_only=Fal
         if topological_holes:
             report["missing_intended_features"] = topological_holes
 
-<<<<<<< HEAD
     # Run remaining detached engines
     # AntiMockupDepthEngine
     anti_mockup = AntiMockupDepthEngine(filepath)
@@ -351,40 +334,6 @@ def audit_file(filepath, session_id=None, baseline_filepath=None, audit_only=Fal
     else:
         report["interlock_status"] = "PASSED"
 
-=======
-    # HTML Runtime Relay (Phase 18)
-    if filepath.endswith('.html'):
-        try:
-            relay = SAPQDOMRelay(filepath)
-            dom_result = relay.dispatch_event_and_capture("body", "click")
-            report["runtime_console_errors"] = dom_result.get("console_errors", [])
-        except Exception as e:
-            if "playwright" in str(e).lower() or "browser" in str(e).lower() or "executable" in str(e).lower():
-                report["runtime_probe"] = {
-                    "status": "NOT_RUN",
-                    "reason": "Playwright browser binary unavailable"
-                }
-            else:
-                report["runtime_probe"] = {
-                    "status": "NOT_RUN",
-                    "reason": str(e)
-                }
-
-    # Recalculate total score integrating all submodules
-    total_penalty = (
-        len(report.get("discontinuities_detected", [])) * 10 +
-        len(report.get("zombie_nodes_detected", [])) * 2 +
-        len(report.get("event_target_mismatches", [])) * 20 +
-        len(report.get("causality_contradictions", [])) * 15 +
-        len(report.get("mockup_hallucinations", [])) * 25 +
-        len(report.get("missing_intended_features", [])) * 30 +
-        len(report.get("cascade_graph_issues", [])) * 15 +
-        len(report.get("python_subprocess_issues", [])) * 25 +
-        len(report.get("llm_audit_issues", [])) * 20 +
-        len(report.get("scope_undeclared_symbols", [])) * 25
-    )
-    report["audit_integrity_score"] = max(0, 100 - total_penalty)
->>>>>>> origin/jules-sapq-fixes-9574348619862130371
 
     # Inject Preflight results into report
     report["preflight_status"] = "PASSED"

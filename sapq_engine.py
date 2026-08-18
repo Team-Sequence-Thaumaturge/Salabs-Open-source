@@ -407,4 +407,18 @@ def audit_directory(dirpath, audit_only=False):
 
 
 # Backward Compatibility Alias
-MultiVectorCrossParsingAuditEngine = SAPQEngine
+# MultiVectorCrossParsingAuditEngine real import
+try:
+    from .multi_vector_parser import MultiVectorCrossParsingAuditEngine
+except ImportError:
+    try:
+        from multi_vector_parser import MultiVectorCrossParsingAuditEngine
+    except ImportError:
+        # MultiVectorCrossParsingAuditEngine real import
+try:
+    from .multi_vector_parser import MultiVectorCrossParsingAuditEngine
+except ImportError:
+    try:
+        from multi_vector_parser import MultiVectorCrossParsingAuditEngine
+    except ImportError:
+        MultiVectorCrossParsingAuditEngine = SAPQEngine

@@ -409,3 +409,11 @@ class ASTParser:
 
         self._traverse(self.ast, advanced_visitor)
         return usages
+
+
+# Backward compatibility alias
+
+
+# Backward compatibility aliases
+ASTMultiVectorParser = ASTParser
+SAPQASTParser = ASTParser

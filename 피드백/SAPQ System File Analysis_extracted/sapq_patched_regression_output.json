@@ -1,0 +1,294 @@
+Spec Matcher Parsing Warning for unused_python_function.py: Line 1: Unexpected identifier
+Spec Matcher Parsing Warning for python_subprocess.py: Line 1: Unexpected token subprocess
+{
+  "valid_function_hoist.js": {
+    "score": 90,
+    "preflight": "PASSED",
+    "discontinuities": [
+      {
+        "symbol": "callLater",
+        "def_line": 2,
+        "ref_line": 1,
+        "issue": "TORSION_CROSSING: Referenced at line 1 before declaration at line 2"
+      }
+    ],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "unused_python_function.py": {
+    "score": 100,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 0,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "interlock_multiline.js": {
+    "score": 100,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 2,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "interlock_same_line.js": {
+    "score": 85,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "causality": [
+      {
+        "type": "CAUSAL_CONTRADICTION",
+        "line": 1,
+        "issue": "CAUSALITY_CONTRADICTION: Upstream Cause and Downstream Effect conflict in state/intent (e.g. active vs disabled).",
+        "code_snippet": "state.active = true; button.disabled = true;"
+      }
+    ],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 1,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "async_race.js": {
+    "score": 80,
+    "preflight": "PASSED",
+    "discontinuities": [
+      {
+        "symbol": "render",
+        "def_line": 4,
+        "ref_line": 3,
+        "issue": "TORSION_CROSSING: Referenced at line 3 before declaration at line 4"
+      }
+    ],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [
+      {
+        "type": "TEMPORAL_LIFECYCLE_LOCK",
+        "issue": "TEMPORAL_LIFECYCLE_LOCK: Data Race. Rendering function 'render' called at L3 before any initialization state is booted.",
+        "line": 3
+      }
+    ],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 2,
+      "V2_Backward_Count": 4,
+      "V3_Skip_Forward_Count": 1,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "mockup_stub.js": {
+    "score": 100,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 0,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "python_subprocess.py": {
+    "score": 85,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [
+      {
+        "type": "MOCKUP_HALLUCINATION",
+        "line": 2,
+        "issue": "MOCKUP_HALLUCINATION: subprocess.run called without explicit creationflags=0x08000000 (CREATE_NO_WINDOW). This will cause Windows popup flashing."
+      }
+    ],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 3,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "missing_dom_target.html": {
+    "score": 80,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [
+      {
+        "symbol": "missing_target",
+        "ref_line": 2,
+        "issue": "EVENT_TARGET_MISMATCH: Target ID 'missing_target' referenced in event handler at L2 does not exist in the DOM."
+      }
+    ],
+    "dom_relay_orchestrated": true,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 13,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "unreferenced_js.js": {
+    "score": 98,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "unusedJsHelper",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      }
+    ],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 0,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "phase4_last_line.js": {
+    "score": 92,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "first",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      },
+      {
+        "symbol": "second",
+        "defined_line": 2,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      },
+      {
+        "symbol": "third",
+        "defined_line": 3,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      },
+      {
+        "symbol": "fourth",
+        "defined_line": 4,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      }
+    ],
+    "causality": [],
+    "mockups": [],
+    "cascade": [],
+    "python_subprocess": [],
+    "event_mismatches": [],
+    "dom_relay_orchestrated": false,
+    "has_spec_mismatches": false,
+    "vector_nodes": {
+      "V1_Forward_Count": 4,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 3,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "python_ast_public_methods": {
+    "get_all_identifier_usages": {
+      "ok": true,
+      "value": [
+        "unused_helper"
+      ]
+    },
+    "detect_torsion_crossings": {
+      "ok": false,
+      "error": "AttributeError: 'Module' object has no attribute 'type'"
+    },
+    "detect_mockup_hallucinations": {
+      "ok": false,
+      "error": "AttributeError: 'Module' object has no attribute 'type'"
+    }
+  },
+  "audit_only": {
+    "ok": false,
+    "error": "ValueError: Invalid state: AUDIT_ONLY_PENDING"
+  },
+  "interlock_consumes_new_report_keys": {
+    "event_target_mismatch_only": {
+      "ok": true,
+      "decision": true
+    },
+    "python_subprocess_issue_only": {
+      "ok": true,
+      "decision": true
+    },
+    "cascade_issue_only": {
+      "ok": true,
+      "decision": true
+    }
+  }
+}

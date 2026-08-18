@@ -1,0 +1,266 @@
+{
+  "valid_function_hoist.js": {
+    "ok": true,
+    "score": 90,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [
+      {
+        "symbol": "callLater",
+        "def_line": 2,
+        "ref_line": 1,
+        "issue": "TORSION_CROSSING: Referenced at line 1 before declaration at line 2"
+      }
+    ],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "python_unused.py": {
+    "ok": true,
+    "score": 100,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "python_mockup.py": {
+    "ok": true,
+    "score": 100,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 3,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "invalid_syntax.py": {
+    "ok": true,
+    "score": 0,
+    "preflight": "FAILED",
+    "syntax_errors": [
+      {
+        "type": "SYNTAX_ERROR",
+        "message": "SyntaxError: invalid syntax at L1"
+      }
+    ],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": null,
+    "vector_nodes": {}
+  },
+  "invalid_syntax.js": {
+    "ok": true,
+    "score": 0,
+    "preflight": "FAILED",
+    "syntax_errors": [
+      {
+        "type": "SYNTAX_ERROR",
+        "message": "SyntaxError: Line 2: Unexpected number"
+      }
+    ],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": null,
+    "vector_nodes": {}
+  },
+  "interlock_multiline.js": {
+    "ok": true,
+    "score": 100,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 2,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "async_race.js": {
+    "ok": true,
+    "score": 90,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [
+      {
+        "symbol": "render",
+        "def_line": 4,
+        "ref_line": 3,
+        "issue": "TORSION_CROSSING: Referenced at line 3 before declaration at line 4"
+      }
+    ],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 2,
+      "V2_Backward_Count": 4,
+      "V3_Skip_Forward_Count": 1,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "mockup_return_true.js": {
+    "ok": true,
+    "score": 75,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [
+      {
+        "type": "SCOPE_REDUCTION",
+        "issue": "SCOPE_REDUCTION: Generated code contains pseudo-stubs, dummy implementations, or incomplete features."
+      }
+    ],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 0,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "phase4_last_line.js": {
+    "ok": true,
+    "score": 92,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "first",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      },
+      {
+        "symbol": "second",
+        "defined_line": 2,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      },
+      {
+        "symbol": "third",
+        "defined_line": 3,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      },
+      {
+        "symbol": "fourth",
+        "defined_line": 4,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      }
+    ],
+    "event_mismatches": [],
+    "undeclared": [],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 4,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 3,
+      "V4_Skip_Backward_Count": 1
+    }
+  },
+  "missing_dom_target.html": {
+    "ok": false,
+    "error": "Error: BrowserType.launch: Executable doesn't exist at /home/ubuntu/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     playwright install                                     ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+  },
+  "undeclared_symbol.js": {
+    "ok": true,
+    "score": 100,
+    "preflight": "PASSED",
+    "syntax_errors": [],
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "undeclared": [
+      {
+        "symbol": "unboundValue",
+        "line": 2,
+        "issue": "SCOPE_UNDECLARED_SYMBOL: 'unboundValue' is used but not declared (ReferenceError Trap)"
+      }
+    ],
+    "mockups": [],
+    "causalities": [],
+    "intent_mismatches": [],
+    "runtime_errors": [],
+    "interlock_status": "'InterlockCircuitBreaker' object has no attribute 'evaluate_audit_report'",
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "audit_only_state_artifacts": [
+    ".sapq_checkpoints",
+    ".sapq_logs"
+  ]
+}

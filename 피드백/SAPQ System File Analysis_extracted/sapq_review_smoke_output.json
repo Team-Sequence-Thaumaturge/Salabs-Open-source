@@ -1,0 +1,151 @@
+{
+  "valid_function_hoist.js": {
+    "score": 90,
+    "preflight": "PASSED",
+    "discontinuities": [
+      {
+        "symbol": "callLater",
+        "def_line": 2,
+        "ref_line": 1,
+        "issue": "TORSION_CROSSING: Referenced at line 1 before declaration at line 2"
+      }
+    ],
+    "zombies": [],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "unused_python_function.py": {
+    "score": 100,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "valid_simple.js": {
+    "score": 100,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 3,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "missing_dom_target.html": {
+    "score": 80,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [
+      {
+        "symbol": "missing_target",
+        "ref_line": 2,
+        "issue": "EVENT_TARGET_MISMATCH: Target ID 'missing_target' referenced in event handler at L2 does not exist in the DOM."
+      }
+    ],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 13,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "interlock_desync.js": {
+    "score": 100,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 2,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "async_race.js": {
+    "score": 90,
+    "preflight": "PASSED",
+    "discontinuities": [
+      {
+        "symbol": "render",
+        "def_line": 4,
+        "ref_line": 3,
+        "issue": "TORSION_CROSSING: Referenced at line 3 before declaration at line 4"
+      }
+    ],
+    "zombies": [],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 2,
+      "V2_Backward_Count": 4,
+      "V3_Skip_Forward_Count": 1,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "baseline_state_dom.js": {
+    "score": 98,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "renderFromState",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      }
+    ],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "target_without_state_dom.js": {
+    "score": 98,
+    "preflight": "PASSED",
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "noop",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced in V2 backward pass OR AST)"
+      }
+    ],
+    "event_mismatches": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 0,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "baseline_comparison": {
+    "score": 68,
+    "missing_intended_features": [
+      {
+        "type": "MISSING_INTENDED_FEATURE",
+        "issue": "MISSING_INTENDED_FEATURE: Topological Hole Detected. The intended semantic capability 'READS_STATE:True|WRITES_DOM:True|IS_HANDLER:False' (e.g., 'renderFromState' in baseline) is completely absent in the target code.",
+        "role_signature": "READS_STATE:True|WRITES_DOM:True|IS_HANDLER:False",
+        "original_functions": [
+          "renderFromState"
+        ]
+      }
+    ]
+  }
+}

@@ -9,6 +9,14 @@ class InterlockCircuitBreaker:
     """
 
     @staticmethod
+    def evaluate_audit_report(report, strict_mode=True):
+        """
+        Evaluate a single audit report from SAPQ engine and decide whether to break the circuit.
+        """
+        # strict_mode is used as part of API compliance, but currently acts identically to standard evaluation
+        return InterlockCircuitBreaker.evaluate_audit_results([report])
+
+    @staticmethod
     def evaluate_audit_results(results):
         """
         Evaluate full audit results from SAPQ engines and decide whether to break the circuit.
@@ -18,9 +26,9 @@ class InterlockCircuitBreaker:
 
         for res in results:
             # Check Level 1-4 contradictions
-            if res.get("discontinuities_detected") or res.get("zombie_nodes_detected") or res.get("index_desync_warnings") or res.get("closed_loop_warnings"):
+            if res.get("discontinuities_detected") or res.get("zombie_nodes_detected") or res.get("index_desync_warnings") or res.get("closed_loop_warnings") or res.get("scope_undeclared_symbols"):
                 has_critical_errors = True
-                trace_log.append(f"Level 1-4 Contradiction found in {res.get('target_file')}")
+                trace_log.append(f"Level 1-4 Contradiction (or Scope Undeclared Symbols) found in {res.get('target_file')}")
 
             # Check Phase 15/16 (Mockup/Hallucination)
             if res.get("mockups_detected"):
@@ -41,6 +49,14 @@ class InterlockCircuitBreaker:
             if res.get("spec_alignment_warnings"):
                 has_critical_errors = True
                 trace_log.append(f"SPEC_ALIGNMENT_MISMATCH found in {res.get('target_file')}")
+
+            if res.get("event_target_mismatches"):
+                has_critical_errors = True
+                trace_log.append(f"EVENT_TARGET_MISMATCH found in {res.get('target_file')}")
+
+            if res.get("cascade_graph_issues"):
+                has_critical_errors = True
+                trace_log.append(f"CASCADE_GRAPH_ISSUE found in {res.get('target_file')}")
 
         if has_critical_errors:
             InterlockCircuitBreaker.dispatch_telegram_alert(trace_log)

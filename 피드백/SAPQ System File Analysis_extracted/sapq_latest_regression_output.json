@@ -1,0 +1,217 @@
+AST Parsing Warning for python_def.py: Line 1: Unexpected identifier
+AST Parsing Warning for invalid_syntax.py: Line 1: Unexpected identifier
+Python AST Parsing Warning for invalid_syntax.py: invalid syntax (<unknown>, line 1)
+AST Parsing Warning for invalid_syntax.js: Line 2: Unexpected number
+AST Parsing Warning for python_def.py: Line 1: Unexpected identifier
+{
+  "valid_function_hoist.js": {
+    "ok": true,
+    "score": 80,
+    "discontinuities": [
+      {
+        "symbol": "callLater",
+        "def_line": 2,
+        "ref_line": 1,
+        "issue": "TORSION_CROSSING: Referenced at line 1 before declaration at line 2"
+      },
+      {
+        "symbol": "callLater",
+        "def_line": 2,
+        "ref_line": 1,
+        "issue": "AST_TORSION_CROSSING: Call at L1 before FunctionDeclaration at L2"
+      }
+    ],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "python_def.py": {
+    "ok": true,
+    "score": 100,
+    "discontinuities": [],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "interlock_multiline.js": {
+    "ok": true,
+    "score": 100,
+    "discontinuities": [],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 4,
+      "V3_Skip_Forward_Count": 2,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "async_race.js": {
+    "ok": true,
+    "score": 80,
+    "discontinuities": [
+      {
+        "symbol": "render",
+        "def_line": 4,
+        "ref_line": 3,
+        "issue": "TORSION_CROSSING: Referenced at line 3 before declaration at line 4"
+      },
+      {
+        "symbol": "render",
+        "def_line": 4,
+        "ref_line": 3,
+        "issue": "AST_TORSION_CROSSING: Call at L3 before FunctionDeclaration at L4"
+      }
+    ],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 2,
+      "V2_Backward_Count": 7,
+      "V3_Skip_Forward_Count": 1,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "mockup_return_true.js": {
+    "ok": true,
+    "score": 100,
+    "discontinuities": [],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "phase4_last_line.js": {
+    "ok": true,
+    "score": 92,
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "first",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced outside its declaration line)"
+      },
+      {
+        "symbol": "second",
+        "defined_line": 2,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced outside its declaration line)"
+      },
+      {
+        "symbol": "third",
+        "defined_line": 3,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced outside its declaration line)"
+      },
+      {
+        "symbol": "fourth",
+        "defined_line": 4,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced outside its declaration line)"
+      }
+    ],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 4,
+      "V2_Backward_Count": 5,
+      "V3_Skip_Forward_Count": 3,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "missing_dom_target.html": {
+    "ok": true,
+    "score": 100,
+    "discontinuities": [],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 13,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "invalid_syntax.py": {
+    "ok": true,
+    "score": 100,
+    "discontinuities": [],
+    "zombies": [],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "invalid_syntax.js": {
+    "ok": true,
+    "score": 98,
+    "discontinuities": [],
+    "zombies": [
+      {
+        "symbol": "broken",
+        "defined_line": 1,
+        "issue": "GHOST_NODE (Defined in V1 forward pass, but never referenced outside its declaration line)"
+      }
+    ],
+    "mockups": [],
+    "python_warnings": [],
+    "spec_warnings": [],
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    }
+  },
+  "python_ast_parser": {
+    "ok": true,
+    "torsion": [],
+    "mockups": []
+  },
+  "standalone_spec_matcher": [
+    {
+      "type": "SPEC_ALIGNMENT_MISMATCH",
+      "issue": "SPEC_ALIGNMENT_MISMATCH: Spec required 'target frequency = 40', but code defined it as '20'."
+    }
+  ],
+  "interlock_decisions": {
+    "valid_function_hoist.js": {
+      "blocked": true,
+      "exit_code": 1,
+      "output": "📲 [TELEGRAM ALERT MOCK] Dispatching trace log to Telegram channel...\n🚨 SAPQ Deployment Audit Failed! Trace Log:\n- Level 1-4 Contradiction found in valid_function_hoist.js\n📲 [TELEGRAM ALERT MOCK] Dispatch complete.\n\n\n🚨 [CIRCUIT BREAKER TRIGGERED] Deployment blocked due to critical SAPQ audit failures:\n  - Level 1-4 Contradiction found in valid_function_hoist.js"
+    },
+    "mockup_return_true.js": {
+      "blocked": false,
+      "output": "✅ [CIRCUIT BREAKER] All checks passed. Deployment may proceed."
+    }
+  }
+}

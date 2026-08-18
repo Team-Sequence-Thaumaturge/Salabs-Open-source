@@ -1,0 +1,92 @@
+{
+  "valid_function_hoist.js": {
+    "score": 90,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    },
+    "discontinuities": [
+      {
+        "symbol": "callLater",
+        "def_line": 2,
+        "ref_line": 1,
+        "issue": "TORSION_CROSSING: Referenced at line 1 before declaration at line 2"
+      }
+    ],
+    "semantic": [],
+    "async": [],
+    "intent": []
+  },
+  "phase4_last_line.js": {
+    "score": 87,
+    "vector_nodes": {
+      "V1_Forward_Count": 4,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 3,
+      "V4_Skip_Backward_Count": 0
+    },
+    "discontinuities": [],
+    "semantic": [
+      {
+        "line": 5,
+        "issue": "DUMMY_STATE_CONTRADICTION: Potential mockup or fake state (Math.random / dummy setTimeout)",
+        "code_snippet": "setTimeout(() => {}, 0);"
+      }
+    ],
+    "async": [],
+    "intent": []
+  },
+  "mixed_async.js": {
+    "score": 100,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 2,
+      "V3_Skip_Forward_Count": 0,
+      "V4_Skip_Backward_Count": 0
+    },
+    "discontinuities": [],
+    "semantic": [],
+    "async": [
+      {
+        "line": 2,
+        "issue": "ASYNC_TIMING_RACE: Mixing await and .then() implies a timing or promise dead-lock contradiction",
+        "code_snippet": "await fetch('/api').then(handle);"
+      }
+    ],
+    "intent": []
+  },
+  "dummy_timeout.js": {
+    "score": 95,
+    "vector_nodes": {
+      "V1_Forward_Count": 0,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 1,
+      "V4_Skip_Backward_Count": 0
+    },
+    "discontinuities": [],
+    "semantic": [
+      {
+        "line": 1,
+        "issue": "DUMMY_STATE_CONTRADICTION: Potential mockup or fake state (Math.random / dummy setTimeout)",
+        "code_snippet": "setTimeout(() => { resolve('ok'); }, 10);"
+      }
+    ],
+    "async": [],
+    "intent": []
+  },
+  "state_desync.js": {
+    "score": 98,
+    "vector_nodes": {
+      "V1_Forward_Count": 1,
+      "V2_Backward_Count": 1,
+      "V3_Skip_Forward_Count": 2,
+      "V4_Skip_Backward_Count": 0
+    },
+    "discontinuities": [],
+    "semantic": [],
+    "async": [],
+    "intent": []
+  }
+}

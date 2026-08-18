@@ -1,0 +1,20 @@
+{
+  "python_ast_adapter": {
+    "get_all_identifier_usages": {
+      "ok": true,
+      "value": []
+    },
+    "detect_torsion_crossings": {
+      "ok": false,
+      "error": "AttributeError: 'Module' object has no attribute 'type'"
+    },
+    "detect_mockup_hallucinations": {
+      "ok": false,
+      "error": "AttributeError: 'Module' object has no attribute 'type'"
+    }
+  },
+  "dom_relay": {
+    "ok": false,
+    "error": "Error: BrowserType.launch: Executable doesn't exist at /home/ubuntu/.cache/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-linux64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     playwright install                                     ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+  }
+}

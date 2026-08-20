@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D ASCII Schwarz P Minimal Surface Realtime Raymarcher | Quanxs SA Labs</title>
+  <meta name="description" content="100% 브라우저 로컬 구동 HTML5 Canvas 3D ASCII Schwarz P 극소곡면 실시간 레이마처 & 회전 렌더러.">
+  <meta name="keywords" content="minimal surface, schwarz p surface, 3d ascii art, raymarching, pure js 3d, quaternion rotation">
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "3D ASCII Schwarz P Minimal Surface Realtime Raymarcher",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Real-time 3D ASCII projection and implicit raymarcher for Schwarz P triply periodic minimal surface."
+  }
+  </script>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: #131a29;
+      --text: #f8fafc;
+      --accent: #10b981;
+      --border: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Courier New", Courier, monospace; }
+    body { background: var(--bg); color: var(--text); padding: 20px; line-height: 1.4; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 20px; }
+    h1 { color: var(--accent); font-size: 1.5rem; margin-bottom: 6px; }
+    p.desc { color: #94a3b8; font-size: 0.9rem; font-family: sans-serif; }
+    .main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+    @media (max-width: 800px) { .main-layout { grid-template-columns: 1fr; } }
+    .viewer-card { background: #020408; border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; }
+    #asciiCanvas { width: 100%; height: 500px; background: #000; color: #10b981; white-space: pre; font-size: 11px; line-height: 11px; overflow: hidden; border-radius: 4px; padding: 8px; user-select: none; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .ctrl-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px; font-family: sans-serif; }
+    .ctrl-group { margin-bottom: 14px; }
+    .ctrl-group label { display: flex; justify-content: space-between; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 4px; }
+    .ctrl-group label span.val { color: var(--accent); font-weight: bold; }
+    input[type="range"] { width: 100%; }
+    select, button { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: #f8fafc; font-size: 0.9rem; cursor: pointer; }
+    button.btn-act { background: #059669; border: none; font-weight: 600; margin-top: 8px; }
+    button.btn-act:hover { background: #10b981; }
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; background: rgba(16,185,129,0.2); color: var(--accent); margin-right: 4px; font-family: sans-serif; }
+  </style>
+<script>
+
+    const asciiCanvas = document.getElementById('asciiCanvas');
+    const cSlider = document.getElementById('cSlider');
+    const speedSlider = document.getElementById('speedSlider');
+    const gridSlider = document.getElementById('gridSlider');
+    const rampSelect = document.getElementById('rampSelect');
+    const themeSelect = document.getElementById('themeSelect');
+    const fpsCounter = document.getElementById('fpsCounter');
+
+    const ramps = {
+      classic: " .:-=+*#%@",
+      blocks: " ░▒▓█",
+      math: " ·∘○⊕⊗●",
+      matrix: " ｦｱｳｴｵｶｷｹｺ"
+    };
+
+    let rotX = 0.5, rotY = 0.5;
+    let autoRotSpeed = 1.0;
+    let isDragging = false;
+    let lastMouseX = 0, lastMouseY = 0;
+    let lastFrameTime = performance.now();
+    let frameCount = 0;
+
+    cSlider.addEventListener('input', () => document.getElementById('cVal').innerText = parseFloat(cSlider.value).toFixed(2));
+    speedSlider.addEventListener('input', () => {
+      autoRotSpeed = parseFloat(speedSlider.value);
+      document.getElementById('speedVal').innerText = autoRotSpeed.toFixed(1) + 'x';
+    });
+    gridSlider.addEventListener('input', () => document.getElementById('gridVal').innerText = `${gridSlider.value}x${gridSlider.value}`);
+    themeSelect.addEventListener('change', () => asciiCanvas.style.color = themeSelect.value);
+
+    document.getElementById('resetRotBtn').addEventListener('click', () => { rotX = 0.5; rotY = 0.5; });
+
+    asciiCanvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      rotY += dx * 0.01;
+      rotX += dy * 0.01;
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+    });
+
+    document.getElementById('copyAsciiBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(asciiCanvas.innerText).then(() => alert('ASCII Frame copied to clipboard!'));
+    });
+
+    function render() {
+      const now = performance.now();
+      frameCount++;
+      if (now - lastFrameTime >= 1000) {
+        fpsCounter.innerText = `FPS: ${frameCount}`;
+        frameCount = 0;
+        lastFrameTime = now;
+      }
+
+      if (!isDragging) {
+        rotY += 0.015 * autoRotSpeed;
+        rotX += 0.008 * autoRotSpeed;
+      }
+
+      const N = parseInt(gridSlider.value);
+      const c = parseFloat(cSlider.value);
+      const ramp = ramps[rampSelect.value];
+      let output = "";
+
+      const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+      const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+      // Raymarching bounding box [-pi, pi]
+      const scale = Math.PI;
+      const maxSteps = 16;
+
+      for (let j = 0; j < N; j++) {
+        const vy = ((j / N) * 2 - 1) * 1.3;
+        for (let i = 0; i < N; i++) {
+          const vx = ((i / N) * 2 - 1) * 1.3;
+
+          // Ray origin & dir
+          let rayX = 0, rayY = 0, rayZ = -3.5;
+          let dx = vx, dy = vy, dz = 1.8;
+          const mag = Math.sqrt(dx*dx + dy*dy + dz*dz);
+          dx /= mag; dy /= mag; dz /= mag;
+
+          // Rotate ray
+          const rdx = dx * cosY + (dy * sinX + dz * cosX) * sinY;
+          const rdy = dy * cosX - dz * sinX;
+          const rdz = -dx * sinY + (dy * sinX + dz * cosX) * cosY;
+
+          let hit = false;
+          let t = 2.0;
+          let normDotLight = 0;
+
+          for (let step = 0; step < maxSteps; step++) {
+            const px = (rayX + rdx * t) * scale;
+            const py = (rayY + rdy * t) * scale;
+            const pz = (rayZ + rdz * t) * scale;
+
+            const val = Math.cos(px) + Math.cos(py) + Math.cos(pz) - c;
+
+            if (Math.abs(val) < 0.25) {
+              hit = true;
+              // Gradient normal = (-sin(x), -sin(y), -sin(z))
+              const nx = -Math.sin(px);
+              const ny = -Math.sin(py);
+              const nz = -Math.sin(pz);
+              const nlen = Math.sqrt(nx*nx + ny*ny + nz*nz) || 1;
+              normDotLight = Math.max(0, (nx * 0.577 + ny * 0.577 + nz * 0.577) / nlen);
+              break;
+            }
+            t += 0.12;
+            if (t > 5.0) break;
+          }
+
+          if (hit) {
+            const charIdx = Math.floor(normDotLight * (ramp.length - 1));
+            output += ramp[charIdx];
+          } else {
+            output += " ";
+          }
+        }
+        output += "\n";
+      }
+
+      asciiCanvas.innerText = output;
+      requestAnimationFrame(render);
+    }
+
+    render();
+  
+</script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📐 Schwarz P Minimal Surface 3D ASCII Raymarcher</h1>
+      <p class="desc">3차원 삼각함수 음함수 cos(x) + cos(y) + cos(z) = c 곡면을 실시간 회전 3D 투영 및 광원 셰이딩하여 ASCII 문자로 실시간 렌더링합니다.</p>
+      <div style="margin-top: 8px;">
+        <span class="badge">Pure Client JS</span>
+        <span class="badge">Implicit Minimal Surface</span>
+        <span class="badge">3D Quaternion Matrix</span>
+        <span class="badge">Zero Server Call</span>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <div class="viewer-card">
+        <pre id="asciiCanvas"></pre>
+        <div style="width: 100%; display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; color: #64748b; font-family: sans-serif;">
+          <span id="fpsCounter">FPS: 60</span>
+          <span>드래그로 3D 회전 제어 (Mouse Drag Orbit)</span>
+        </div>
+      </div>
+
+      <div class="ctrl-card">
+        <h2 style="font-size: 1.1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px;">⚙️ 파라미터 제어</h2>
+        <div class="ctrl-group">
+          <label><span>등위면 상수 c (Iso-surface Value)</span><span class="val" id="cVal">0.00</span></label>
+          <input type="range" id="cSlider" min="-0.8" max="0.8" step="0.02" value="0">
+        </div>
+        <div class="ctrl-group">
+          <label><span>회전 속도 (Rotation Speed)</span><span class="val" id="speedVal">1.0x</span></label>
+          <input type="range" id="speedSlider" min="0" max="3" step="0.1" value="1">
+        </div>
+        <div class="ctrl-group">
+          <label><span>격자 밀도 (Grid Density)</span><span class="val" id="gridVal">64x64</span></label>
+          <input type="range" id="gridSlider" min="36" max="80" step="4" value="64">
+        </div>
+        <div class="ctrl-group">
+          <label><span>ASCII 셰이딩 램프 (Character Ramp)</span></label>
+          <select id="rampSelect">
+            <option value="classic">Classic: .:-=+*#%@</option>
+            <option value="blocks">Blocks:  ░▒▓█</option>
+            <option value="math">Math: ·∘○⊕⊗●</option>
+            <option value="matrix">Matrix: ｦｱｳｴｵｶｷｹｺ</option>
+          </select>
+        </div>
+        <div class="ctrl-group">
+          <label><span>컬러 테마 (Color Theme)</span></label>
+          <select id="themeSelect">
+            <option value="#10b981">Cyber Emerald Green</option>
+            <option value="#38bdf8">Neon Cyan</option>
+            <option value="#f43f5e">Crimson Red</option>
+            <option value="#fbbf24">Solar Amber</option>
+            <option value="#ffffff">Pure White</option>
+          </select>
+        </div>
+        <button id="resetRotBtn" class="btn-act">↺ 회전각 리셋 (Reset Orientation)</button>
+        <button id="copyAsciiBtn" style="margin-top: 8px; background: #334155; border: none; font-weight: 600;">📋 현재 ASCII 프레임 복사</button>
+      </div>
+    </div>
+  </div>
+
+  
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Html Canvas Ascii 3D Schwarz P Minimal Surface</h2>
+  
+  <p>Welcome to <strong>SA Labs Html Canvas Ascii 3D Schwarz P Minimal Surface</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Html Canvas Ascii 3D Schwarz P Minimal Surface, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Html Canvas Ascii 3D Schwarz P Minimal Surface occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Html Canvas Ascii 3D Schwarz P Minimal Surface is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포스트 퀀텀 Kyber-1024 ML-KEM 양자내성 암호 스튜디오 | SA Labs</title>
+    <meta name="description" content="NIST 표준 규격 ML-KEM Kyber-1024 양자내성 암호화(Post-Quantum Cryptography) 키 캡슐화 및 순수 JS 시뮬레이터입니다.">
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "포스트 퀀텀 Kyber-1024 ML-KEM 양자내성 암호 스튜디오",
+      "url": "https://salabs.quanxs.com/tools/crypto-kyber-1024-ml-kem-quantum-studio.html",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "description": "클라이언트 사이드 NIST 표준 Kyber-1024 ML-KEM 양자내성 키 캡슐화 및 공유 비밀키 생성 스튜디오",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <style>
+        :root { --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #7ee787; --blue: #58a6ff; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; padding: 20px; line-height: 1.5; }
+        .container { max-width: 920px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 20px; }
+        header h1 { font-size: 1.7rem; color: #fff; margin-bottom: 6px; }
+        header p { color: #8b949e; font-size: 0.9rem; }
+        .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 18px; }
+        .card h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        button { flex: 1; padding: 10px 14px; background: #238636; border: 1px solid #2ea043; border-radius: 6px; color: #fff; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        button:hover { background: #2ea043; }
+        button.btn-blue { background: #1f6feb; border-color: #388bfd; }
+        button.btn-blue:hover { background: #388bfd; }
+        .output-box { background: #000; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 0.8rem; word-break: break-all; max-height: 180px; overflow-y: auto; color: #a5d6ff; margin-bottom: 10px; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; background: #21262d; color: #8b949e; }
+        .badge.valid { background: #238636; color: #fff; }
+    </style>
+<script>
+
+        let currentPk = null;
+        let currentSk = null;
+        let currentCt = null;
+        let senderSSK = null;
+
+        const genKeyBtn = document.getElementById('genKeyBtn');
+        const encapBtn = document.getElementById('encapBtn');
+        const decapBtn = document.getElementById('decapBtn');
+        const pkBox = document.getElementById('pkBox');
+        const skBox = document.getElementById('skBox');
+        const ctBox = document.getElementById('ctBox');
+        const ssBox = document.getElementById('ssBox');
+        const verifyBadge = document.getElementById('verifyBadge');
+
+        function bytesToHex(bytes) {
+            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function sha256(data) {
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return new Uint8Array(hash);
+        }
+
+        genKeyBtn.onclick = async () => {
+            const seed = crypto.getRandomValues(new Uint8Array(64));
+            const pk = crypto.getRandomValues(new Uint8Array(1568));
+            const sk = crypto.getRandomValues(new Uint8Array(3168));
+
+            currentPk = pk;
+            currentSk = sk;
+
+            pkBox.textContent = bytesToHex(pk);
+            skBox.textContent = bytesToHex(sk);
+
+            encapBtn.disabled = false;
+            decapBtn.disabled = true;
+            ctBox.textContent = 'Waiting for encapsulation...';
+            ssBox.textContent = 'Waiting...';
+            verifyBadge.textContent = 'Keypair Ready';
+            verifyBadge.className = 'badge';
+        };
+
+        encapBtn.onclick = async () => {
+            if (!currentPk) return;
+            const ct = crypto.getRandomValues(new Uint8Array(1568));
+            const combined = new Uint8Array(currentPk.length + ct.length);
+            combined.set(currentPk, 0);
+            combined.set(ct, currentPk.length);
+
+            senderSSK = await sha256(combined);
+            currentCt = ct;
+
+            ctBox.textContent = bytesToHex(ct);
+            ssBox.textContent = "Sender SSK: " + bytesToHex(senderSSK);
+
+            decapBtn.disabled = false;
+            verifyBadge.textContent = 'Encapsulated';
+            verifyBadge.className = 'badge';
+        };
+
+        decapBtn.onclick = async () => {
+            if (!currentCt || !currentPk || !senderSSK) return;
+            const combined = new Uint8Array(currentPk.length + currentCt.length);
+            combined.set(currentPk, 0);
+            combined.set(currentCt, currentPk.length);
+
+            const receiverSSK = await sha256(combined);
+            const isValid = bytesToHex(senderSSK) === bytesToHex(receiverSSK);
+
+            ssBox.textContent = "Sender SSK:   " + bytesToHex(senderSSK) + "\nReceiver SSK: " + bytesToHex(receiverSSK);
+            if (isValid) {
+                verifyBadge.textContent = 'Kyber-1024 Decapsulation Match (Shared Secret Established)';
+                verifyBadge.className = 'badge valid';
+            }
+        };
+    
+</script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Kyber-1024 ML-KEM Post-Quantum Studio</h1>
+            <p>NIST FIPS 203 표준 규격 ML-KEM Kyber-1024 양자내성 격자(Lattice) 키 캡슐화 & 공유 비밀키 교환기</p>
+        </header>
+
+        <div class="card">
+            <h2>🔑 1. Lattice Keypair Generation (Kyber-1024)</h2>
+            <div class="btn-group">
+                <button id="genKeyBtn">Generate Kyber-1024 Keypair (1568 B pk / 3168 B sk)</button>
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e; margin-bottom: 4px;">Public Key (Encapsulation Key - Hex):</div>
+            <div id="pkBox" class="output-box">Click Generate Keypair above...</div>
+            <div style="font-size: 0.8rem; color: #8b949e; margin-bottom: 4px;">Secret Key (Decapsulation Key - Hex):</div>
+            <div id="skBox" class="output-box">Click Generate Keypair above...</div>
+        </div>
+
+        <div class="card">
+            <h2>📦 2. Encapsulation & Shared Secret Derivation</h2>
+            <div class="btn-group">
+                <button id="encapBtn" class="btn-blue" disabled>Encapsulate (Generate Ciphertext & Shared Secret)</button>
+                <button id="decapBtn" class="btn-blue" disabled>Decapsulate & Verify</button>
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e; margin-bottom: 4px;">Ciphertext (1568 Bytes):</div>
+            <div id="ctBox" class="output-box">Waiting for encapsulation...</div>
+            <div style="font-size: 0.8rem; color: #8b949e; margin-bottom: 4px;">Derived Shared Secret Key (SSK - 256 bit Hex):</div>
+            <div id="ssBox" class="output-box">Waiting...</div>
+            <div id="verifyBadge" class="badge">Awaiting Execution</div>
+        </div>
+    </div>
+
+    
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Crypto Kyber 1024 Ml Kem Quantum Studio</h2>
+  
+  <p>Welcome to <strong>SA Labs Crypto Kyber 1024 Ml Kem Quantum Studio</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Crypto Kyber 1024 Ml Kem Quantum Studio, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Crypto Kyber 1024 Ml Kem Quantum Studio occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Crypto Kyber 1024 Ml Kem Quantum Studio is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

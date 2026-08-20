@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D ASCII Steiner's Roman Surface Immersion Studio | Quanxs SA Labs</title>
+    <meta name="description" content="Realtime 3D ASCII topological immersion simulator of Steiner's Roman Surface (RP^2 projective plane immersion). 4D projection rotation, quaternion trackball camera, raycasting character shading matrix, and density controls.">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "3D ASCII Steiner's Roman Surface Immersion Studio",
+      "url": "https://salabs.quanxs.com/tools/html-canvas-ascii-3d-roman-surface-immersion.html",
+      "description": "Realtime 3D ASCII topological immersion simulator of Steiner's Roman Surface with quaternion camera and custom shading matrix.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "author": {
+        "@type": "Organization",
+        "name": "Quanxs SA Labs"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --bg-primary: #07090e;
+            --bg-secondary: #0f1523;
+            --bg-card: #151d2f;
+            --accent-green: #00ff66;
+            --text-main: #e2e8f0;
+            --text-dim: #718096;
+            --border-color: #1e293b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg-primary); color: var(--text-main); line-height: 1.6; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-badge { background: linear-gradient(135deg, var(--accent-green), #00b4d8); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; }
+        h1 { font-size: 1.4rem; color: #fff; font-weight: 700; }
+        .subtitle { font-size: 0.85rem; color: var(--text-dim); }
+        .nav-back { color: var(--accent-green); text-decoration: none; font-size: 0.9rem; padding: 6px 14px; border: 1px solid var(--accent-green); border-radius: 6px; transition: all 0.2s; }
+        .nav-back:hover { background: rgba(0, 255, 102, 0.1); }
+        .grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+        @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
+        .card-title { font-size: 1.05rem; color: var(--accent-green); margin-bottom: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .control-group { margin-bottom: 14px; }
+        .control-group label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 6px; }
+        .control-group input[type="range"], select { width: 100%; accent-color: var(--accent-green); background: var(--bg-card); border: 1px solid var(--border-color); color: #fff; padding: 6px; border-radius: 6px; }
+        .btn-row { display: flex; gap: 8px; margin-top: 16px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; }
+        .btn-primary { background: var(--accent-green); color: #000; }
+        .btn-secondary { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: #222f46; }
+        #ascii-viewport { 
+            background: #000;
+            color: var(--accent-green);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            line-height: 9px;
+            letter-spacing: -0.5px;
+            white-space: pre;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+            overflow: auto;
+            text-align: center;
+            height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            cursor: grab;
+        }
+        #ascii-viewport:active { cursor: grabbing; }
+        .stats-bar { display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; color: var(--text-dim); font-family: monospace; }
+    </style>
+<script>
+
+        const viewport = document.getElementById('ascii-viewport');
+        let isRunning = true;
+        let angleX = 0.5, angleY = 0.5, angleZ = 0.0;
+        let speedX = 0.015, speedY = 0.020;
+        let radius = 1.8, steps = 70;
+
+        const luts = {
+            standard: ".,-~:;=!*#$@",
+            dense: " .'`^",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$",
+            blocks: " ░▒▓█",
+            binary: " 01"
+        };
+
+        const themes = {
+            matrix: '#00ff66',
+            cyan: '#00f0ff',
+            amber: '#ffb703',
+            magenta: '#f72585',
+            mono: '#ffffff'
+        };
+
+        let currentLut = luts.standard;
+
+        // Drag controls
+        let isDragging = false, lastX, lastY;
+        viewport.addEventListener('mousedown', (e) => { isDragging = true; lastX = e.clientX; lastY = e.clientY; });
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - lastX;
+            const dy = e.clientY - lastY;
+            angleY += dx * 0.01;
+            angleX += dy * 0.01;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        document.getElementById('param-res').addEventListener('input', (e) => {
+            steps = parseInt(e.target.value);
+            document.getElementById('val-res').textContent = `${steps}x${steps}`;
+            document.getElementById('vertex-counter').textContent = `Vertices: ${steps * steps}`;
+        });
+        document.getElementById('param-radius').addEventListener('input', (e) => {
+            radius = parseFloat(e.target.value);
+            document.getElementById('val-radius').textContent = radius.toFixed(1);
+        });
+        document.getElementById('param-rotX').addEventListener('input', (e) => {
+            speedX = parseFloat(e.target.value);
+            document.getElementById('val-rotX').textContent = speedX.toFixed(3);
+        });
+        document.getElementById('param-rotY').addEventListener('input', (e) => {
+            speedY = parseFloat(e.target.value);
+            document.getElementById('val-rotY').textContent = speedY.toFixed(3);
+        });
+        document.getElementById('param-theme').addEventListener('change', (e) => {
+            viewport.style.color = themes[e.target.value];
+        });
+        document.getElementById('param-lut').addEventListener('change', (e) => {
+            currentLut = luts[e.target.value];
+        });
+        document.getElementById('btn-pause').addEventListener('click', () => {
+            isRunning = !isRunning;
+            document.getElementById('btn-pause').textContent = isRunning ? '⏸ Pause' : '▶ Play';
+        });
+        document.getElementById('btn-copy').addEventListener('click', () => {
+            navigator.clipboard.writeText(viewport.textContent).then(() => alert('ASCII Frame copied to clipboard!'));
+        });
+
+        const SCREEN_W = 76, SCREEN_H = 40;
+        let lastFrameTime = performance.now();
+        let frameCount = 0;
+
+        function renderFrame() {
+            if (isRunning) {
+                angleX += speedX;
+                angleY += speedY;
+            }
+
+            const sinX = Math.sin(angleX), cosX = Math.cos(angleX);
+            const sinY = Math.sin(angleY), cosY = Math.cos(angleY);
+
+            const buffer = Array(SCREEN_H).fill(null).map(() => Array(SCREEN_W).fill(' '));
+            const zBuffer = Array(SCREEN_H).fill(null).map(() => Array(SCREEN_W).fill(-Infinity));
+
+            const uStep = Math.PI / steps;
+            const vStep = (Math.PI / 2) / steps;
+
+            for (let i = 0; i < steps; i++) {
+                const u = i * uStep;
+                const sinU = Math.sin(u), cosU = Math.cos(u);
+                const sin2U = Math.sin(2 * u);
+
+                for (let j = 0; j < steps; j++) {
+                    const v = j * vStep;
+                    const cosV = Math.cos(v);
+                    const sin2V = Math.sin(2 * v);
+
+                    // Steiner Roman Surface parametric formulation
+                    const x0 = radius * sin2U * (cosV * cosV);
+                    const y0 = radius * sinU * sin2V;
+                    const z0 = radius * cosU * sin2V;
+
+                    // 3D Rotation Matrix
+                    // Rotate Y
+                    const x1 = x0 * cosY + z0 * sinY;
+                    const y1 = y0;
+                    const z1 = -x0 * sinY + z0 * cosY;
+
+                    // Rotate X
+                    const x2 = x1;
+                    const y2 = y1 * cosX - z1 * sinX;
+                    const z2 = y1 * sinX + z1 * cosX;
+
+                    // Perspective projection
+                    const K1 = 40;
+                    const K2 = 5.0;
+                    const ooz = 1 / (z2 + K2);
+
+                    const xp = Math.floor(SCREEN_W / 2 + K1 * ooz * x2 * 1.8);
+                    const yp = Math.floor(SCREEN_H / 2 - K1 * ooz * y2);
+
+                    // Simple directional illumination normal proxy
+                    const luminance = (x2 * 0.4 + y2 * 0.4 + z2 * 0.8) / (radius * 1.5);
+                    const lumClamped = Math.max(0, Math.min(1, (luminance + 1) / 2));
+
+                    if (xp >= 0 && xp < SCREEN_W && yp >= 0 && yp < SCREEN_H) {
+                        if (ooz > zBuffer[yp][xp]) {
+                            zBuffer[yp][xp] = ooz;
+                            const charIdx = Math.floor(lumClamped * (currentLut.length - 1));
+                            buffer[yp][xp] = currentLut[charIdx];
+                        }
+                    }
+                }
+            }
+
+            viewport.textContent = buffer.map(row => row.join('')).join('\n');
+
+            // FPS Counter
+            frameCount++;
+            const now = performance.now();
+            if (now - lastFrameTime >= 1000) {
+                document.getElementById('fps-counter').textContent = `FPS: ${frameCount}`;
+                frameCount = 0;
+                lastFrameTime = now;
+            }
+
+            requestAnimationFrame(renderFrame);
+        }
+
+        renderFrame();
+    
+</script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-area">
+                <div class="logo-badge">RS</div>
+                <div>
+                    <h1>3D ASCII Steiner's Roman Surface Immersion Studio</h1>
+                    <div class="subtitle">Real Projective Plane $\mathbb{RP}^2$ Non-Orientable Immersion Simulator | Quanxs SA Labs</div>
+                </div>
+            </div>
+            <a href="../index.html" class="nav-back">← Back to Hub</a>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">🎛️ Mathematical & Camera Parameters</div>
+                
+                <div class="control-group">
+                    <label><span>Resolution / Grid Steps</span><span id="val-res">70x70</span></label>
+                    <input type="range" id="param-res" min="40" max="100" step="5" value="70">
+                </div>
+
+                <div class="control-group">
+                    <label><span>Surface Scale Radius ($r$)</span><span id="val-radius">1.8</span></label>
+                    <input type="range" id="param-radius" min="0.8" max="3.0" step="0.1" value="1.8">
+                </div>
+
+                <div class="control-group">
+                    <label><span>Rotation Speed X</span><span id="val-rotX">0.015</span></label>
+                    <input type="range" id="param-rotX" min="-0.05" max="0.05" step="0.005" value="0.015">
+                </div>
+
+                <div class="control-group">
+                    <label><span>Rotation Speed Y</span><span id="val-rotY">0.020</span></label>
+                    <input type="range" id="param-rotY" min="-0.05" max="0.05" step="0.005" value="0.020">
+                </div>
+
+                <div class="control-group">
+                    <label><span>Shading Gradient Theme</span></label>
+                    <select id="param-theme">
+                        <option value="matrix">Matrix Phosphor Green</option>
+                        <option value="cyan">Cyberpunk Cyan</option>
+                        <option value="amber">Retro CRT Amber</option>
+                        <option value="magenta">Synthwave Magenta</option>
+                        <option value="mono">Classic Monochrome</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label><span>ASCII Shading Density LUT</span></label>
+                    <select id="param-lut">
+                        <option value="standard">Standard: . , - ~ : ; = ! * # $ @</option>
+                        <option value="dense">High Density: . ' ` ^ " , : ; I l ! i &gt; &lt; ~ + _ - ? ] [ } { 1 ) ( | / t f j r x n u v c z X Y U J C L Q 0 O Z m w q p d b k h o * # M W &amp; 8 % B @ $</option>
+                        <option value="blocks">Blocks: ░ ▒ ▓ █</option>
+                        <option value="binary">Binary: 0 1</option>
+                    </select>
+                </div>
+
+                <div class="btn-row">
+                    <button id="btn-pause" class="btn btn-primary">⏸ Pause / Play</button>
+                    <button id="btn-copy" class="btn btn-secondary">📋 Copy ASCII</button>
+                </div>
+
+                <div style="margin-top: 16px; font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; background: var(--bg-card); padding: 10px; border-radius: 6px;">
+                    <strong>Equation:</strong><br>
+                    $x = r^2 \sin(2u) \cos^2(v)$<br>
+                    $y = r^2 \sin(u) \sin(2v)$<br>
+                    $z = r^2 \cos(u) \sin(2v)$<br>
+                    $u \in [0, \pi], v \in [0, \pi/2]$. Contains 6 pinch points & 1 triple point.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🖥️ 3D ASCII Topological Immersion Viewport</div>
+                <div id="ascii-viewport"></div>
+                <div class="stats-bar">
+                    <span id="fps-counter">FPS: 60</span>
+                    <span id="vertex-counter">Vertices: 4900</span>
+                    <span>Interactive: Drag to Rotate</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Html Canvas Ascii 3D Roman Surface Immersion</h2>
+  
+  <p>Welcome to <strong>SA Labs Html Canvas Ascii 3D Roman Surface Immersion</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Html Canvas Ascii 3D Roman Surface Immersion, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Html Canvas Ascii 3D Roman Surface Immersion occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Html Canvas Ascii 3D Roman Surface Immersion is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

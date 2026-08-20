@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNS SPF & DMARC Policy Syntax Analyzer - Quanxs SA Labs</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "DNS SPF & DMARC Policy Syntax Analyzer",
+  "url": "https://salabs.quanxs.com/tools/dns-spf-dmarc-analyzer.html",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5.",
+  "author": {
+    "@type": "Organization",
+    "name": "Quanxs SA Labs"
+  }
+}
+</script>
+<style>
+:root { --bg: #0f172a; --card: #1e293b; --border: #334155; --accent: #38bdf8; --text: #f8fafc; --text-muted: #94a3b8; --success: #4ade80; --warn: #fbbf24; --danger: #f87171; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+body { background: var(--bg); color: var(--text); padding: 24px 16px; min-height: 100vh; }
+.container { max-width: 960px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+h1 { color: var(--accent); font-size: 1.6rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+p.desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+.tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.tab-btn { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.tab-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.form-group { margin-bottom: 16px; }
+label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text); font-size: 0.9rem; }
+textarea, input[type="text"] { width: 100%; background: #0b1120; border: 1px solid var(--border); border-radius: 6px; padding: 12px; color: var(--accent); font-family: monospace; font-size: 0.95rem; }
+textarea { height: 100px; resize: vertical; }
+.btn-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.btn { background: var(--accent); color: var(--bg); border: none; padding: 10px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn:hover { opacity: 0.9; }
+.btn-preset { background: #334155; color: var(--text); }
+.results { background: #0b1120; border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-top: 16px; }
+.result-item { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #1e293b; }
+.result-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-right: 6px; }
+.badge-pass { background: rgba(74, 222, 128, 0.2); color: var(--success); border: 1px solid var(--success); }
+.badge-warn { background: rgba(251, 191, 36, 0.2); color: var(--warn); border: 1px solid var(--warn); }
+.badge-fail { background: rgba(248, 113, 113, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+.score-box { display: flex; align-items: center; justify-content: space-between; background: #1e293b; padding: 14px; border-radius: 6px; margin-bottom: 14px; }
+</style>
+<script>
+
+let currentMode = 'spf';
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('tab-spf').className = mode === 'spf' ? 'tab-btn active' : 'tab-btn';
+  document.getElementById('tab-dmarc').className = mode === 'dmarc' ? 'tab-btn active' : 'tab-btn';
+  document.getElementById('input-label').textContent = mode === 'spf' ? 'Enter SPF TXT Record String:' : 'Enter DMARC TXT Record String:';
+  document.getElementById('record-input').placeholder = mode === 'spf' ? 'v=spf1 include:_spf.google.com ~all' : 'v=DMARC1; p=reject; sp=reject; pct=100; rua=mailto:dmarc-reports@example.com';
+  document.getElementById('results-box').innerHTML = '<p style="color: var(--text-muted);">Enter a TXT record above and click Analyze.</p>';
+}
+
+function loadSample() {
+  if (currentMode === 'spf') {
+    document.getElementById('record-input').value = 'v=spf1 ip4:192.0.2.0/24 include:_spf.google.com include:mailgun.org ~all';
+  } else {
+    document.getElementById('record-input').value = 'v=DMARC1; p=reject; sp=quarantine; pct=100; rua=mailto:reports@example.com; ruf=mailto:forensics@example.com; fo=1; aspf=r; adkim=r';
+  }
+  analyzeRecord();
+}
+
+function analyzeRecord() {
+  const text = document.getElementById('record-input').value.trim();
+  const box = document.getElementById('results-box');
+  if (!text) {
+    box.innerHTML = '<p style="color: var(--danger);">Please enter a record string.</p>';
+    return;
+  }
+
+  if (currentMode === 'spf') {
+    analyzeSPF(text, box);
+  } else {
+    analyzeDMARC(text, box);
+  }
+}
+
+function analyzeSPF(spf, box) {
+  let score = 100;
+  let items = [];
+  const parts = spf.split(/\s+/);
+
+  if (parts[0] !== 'v=spf1') {
+    score -= 50;
+    items.push({ type: 'fail', msg: 'Missing mandatory version prefix "v=spf1" at start of record.' });
+  } else {
+    items.push({ type: 'pass', msg: 'Valid SPF version tag "v=spf1" detected.' });
+  }
+
+  let hasAll = false;
+  let lookupCount = 0;
+
+  for (let i = 1; i < parts.length; i++) {
+    const part = parts[i];
+    if (part.endsWith('all')) {
+      hasAll = true;
+      if (part === '-all') items.push({ type: 'pass', msg: 'Strict Hard Fail "-all" policy detected (Strongest protection).' });
+      else if (part === '~all') items.push({ type: 'pass', msg: 'Soft Fail "~all" policy detected (Recommended for transitional SPF).' });
+      else if (part === '?all') { score -= 20; items.push({ type: 'warn', msg: 'Neutral "?all" policy provides zero authentication enforcement.' }); }
+      else if (part === '+all') { score -= 80; items.push({ type: 'fail', msg: 'Permissive "+all" allows ALL mail senders. Extreme security vulnerability!' }); }
+    } else if (part.startsWith('include:') || part.startsWith('a') || part.startsWith('mx') || part.startsWith('ptr') || part.startsWith('exists:')) {
+      lookupCount++;
+      items.push({ type: 'pass', msg: `Mechanism "${part}" parsed (DNS Lookup #${lookupCount}).` });
+    } else if (part.startsWith('ip4:') || part.startsWith('ip6:')) {
+      items.push({ type: 'pass', msg: `Static IP mechanism "${part}" parsed (Zero DNS lookup cost).` });
+    } else if (part.startsWith('redirect=')) {
+      lookupCount++;
+      items.push({ type: 'warn', msg: `Redirect modifier "${part}" parsed.` });
+    } else {
+      score -= 10;
+      items.push({ type: 'warn', msg: `Unknown or malformed mechanism: "${part}".` });
+    }
+  }
+
+  if (!hasAll) {
+    score -= 30;
+    items.push({ type: 'fail', msg: 'Missing terminal "all" mechanism. Mail receivers cannot determine default action.' });
+  }
+
+  if (lookupCount > 10) {
+    score -= 40;
+    items.push({ type: 'fail', msg: `DNS lookup count is ${lookupCount}/10 (RFC 7208 Hard Limit Exceeded! SPF will fail with PermError).` });
+  } else {
+    items.push({ type: 'pass', msg: `DNS lookup cost is ${lookupCount}/10 (Within RFC 7208 safe limit).` });
+  }
+
+  renderScore(score, items, box);
+}
+
+function analyzeDMARC(dmarc, box) {
+  let score = 100;
+  let items = [];
+  const tags = dmarc.split(';').map(s => s.trim()).filter(Boolean);
+  const tagMap = {};
+
+  tags.forEach(t => {
+    const eq = t.indexOf('=');
+    if (eq !== -1) {
+      const k = t.substring(0, eq).trim().toLowerCase();
+      const v = t.substring(eq + 1).trim();
+      tagMap[k] = v;
+    }
+  });
+
+  if (tagMap['v'] !== 'DMARC1') {
+    score -= 50;
+    items.push({ type: 'fail', msg: 'Missing mandatory version tag "v=DMARC1" at the start.' });
+  } else {
+    items.push({ type: 'pass', msg: 'Valid DMARC version "v=DMARC1" tag identified.' });
+  }
+
+  if (!tagMap['p']) {
+    score -= 40;
+    items.push({ type: 'fail', msg: 'Missing mandatory policy tag "p=" (none, quarantine, reject).' });
+  } else {
+    const p = tagMap['p'].toLowerCase();
+    if (p === 'reject') items.push({ type: 'pass', msg: 'Policy "p=reject": Unauthorized emails will be rejected by receiver servers.' });
+    else if (p === 'quarantine') items.push({ type: 'pass', msg: 'Policy "p=quarantine": Unauthorized emails will be routed to spam/junk.' });
+    else if (p === 'none') { score -= 25; items.push({ type: 'warn', msg: 'Policy "p=none": Monitoring mode only. No delivery enforcement applied.' }); }
+    else { score -= 30; items.push({ type: 'fail', msg: `Invalid policy value "p=${p}".` }); }
+  }
+
+  if (tagMap['rua']) {
+    items.push({ type: 'pass', msg: `Aggregate feedback URI "rua=${tagMap['rua']}" configured.` });
+  } else {
+    score -= 20;
+    items.push({ type: 'warn', msg: 'No "rua=" reporting URI specified. You will not receive aggregate authentication failure reports.' });
+  }
+
+  if (tagMap['pct']) {
+    const pct = parseInt(tagMap['pct']);
+    if (pct < 100) {
+      items.push({ type: 'warn', msg: `Policy filter applies to only ${pct}% of messages.` });
+    } else {
+      items.push({ type: 'pass', msg: 'Policy applies to 100% of messages.' });
+    }
+  }
+
+  renderScore(score, items, box);
+}
+
+function renderScore(score, items, box) {
+  score = Math.max(0, Math.min(100, score));
+  let badgeClass = score >= 80 ? 'badge-pass' : (score >= 50 ? 'badge-warn' : 'badge-fail');
+  let statusText = score >= 80 ? 'EXCELLENT' : (score >= 50 ? 'WARNINGS DETECTED' : 'CRITICAL ISSUES');
+
+  let html = `
+    <div class="score-box">
+      <div><strong>Security & Syntax Score:</strong> <span style="font-size:1.3rem; font-weight:800; color:var(--accent);">${score}/100</span></div>
+      <span class="badge ${badgeClass}">${statusText}</span>
+    </div>
+  `;
+
+  items.forEach(item => {
+    let bClass = item.type === 'pass' ? 'badge-pass' : (item.type === 'warn' ? 'badge-warn' : 'badge-fail');
+    html += `
+      <div class="result-item">
+        <span class="badge ${bClass}">${item.type}</span>
+        <span>${item.msg}</span>
+      </div>
+    `;
+  });
+
+  box.innerHTML = html;
+}
+
+</script>
+</head>
+<body>
+<div class="container">
+  <h1>🛡️ DNS SPF & DMARC Policy Syntax Analyzer</h1>
+  <p class="desc">100% Client-Side Pure JS Email Security Record Validator. Zero server lookup required.</p>
+  
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-spf" onclick="switchMode('spf')">SPF Record Validator</button>
+    <button class="tab-btn" id="tab-dmarc" onclick="switchMode('dmarc')">DMARC Policy Validator</button>
+  </div>
+
+  <div class="form-group">
+    <label id="input-label">Enter SPF TXT Record String:</label>
+    <textarea id="record-input" placeholder="v=spf1 include:_spf.google.com ~all"></textarea>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" onclick="analyzeRecord()">Analyze Syntax & Policy</button>
+    <button class="btn btn-preset" onclick="loadSample()">Load Sample Record</button>
+  </div>
+
+  <div class="results" id="results-box">
+    <p style="color: var(--text-muted);">Enter a TXT record above and click Analyze.</p>
+  </div>
+</div>
+
+
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Dns Spf Dmarc Analyzer</h2>
+  
+  <p>Welcome to <strong>SA Labs Dns Spf Dmarc Analyzer</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Dns Spf Dmarc Analyzer, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Dns Spf Dmarc Analyzer occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Dns Spf Dmarc Analyzer is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

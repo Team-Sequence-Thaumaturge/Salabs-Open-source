@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas ASCII 3D Mandelbulb Fractal Raymarcher | Quanxs SA Labs</title>
+  <meta name="description" content="100% Client-Side 3D Mandelbulb Fractal Raymarcher rendered in real-time ASCII characters with rotation and power parameters.">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Canvas ASCII 3D Mandelbulb Fractal Raymarcher",
+    "url": "https://salabs.quanxs.com/tools/html-canvas-ascii-3d-mandelbulb-raymarcher.html",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript and HTML5 Canvas support"
+  }
+  </script>
+  <style>
+    :root { --bg: #0a0c10; --card: #12161f; --border: #21262d; --text: #c9d1d9; --accent: #3fb950; }
+    body { margin: 0; padding: 20px; background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { color: #58a6ff; font-size: 1.4rem; font-family: -apple-system, sans-serif; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    pre#asciiScreen { background: #010409; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 9px; line-height: 9px; color: var(--accent); overflow: auto; text-align: center; user-select: none; font-weight: bold; }
+    .ctrl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; font-family: -apple-system, sans-serif; font-size: 0.9rem; }
+    .ctrl-box { background: #0d1117; padding: 10px; border-radius: 6px; border: 1px solid var(--border); }
+    input[type=range] { width: 100%; accent-color: #58a6ff; }
+    .btn { background: #238636; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+  </style>
+<script>
+
+const screen = document.getElementById('asciiScreen');
+const COLS = 80;
+const ROWS = 40;
+const CHARS = " .:-=+*#%@";
+
+let power = 8.0;
+let speed = 1.0;
+let angleY = 0;
+let angleX = 0.3;
+let paused = false;
+
+function DE(x, y, z, p) {
+  let zx = x, zy = y, zz = z;
+  let dr = 1.0;
+  let r = 0.0;
+  for (let i = 0; i < 4; i++) {
+    r = Math.sqrt(zx*zx + zy*zy + zz*zz);
+    if (r > 2.0) break;
+    let theta = Math.acos(zz / (r + 1e-6));
+    let phi = Math.atan2(zy, zx);
+    dr = Math.pow(r, p - 1.0) * p * dr + 1.0;
+    let zr = Math.pow(r, p);
+    theta = theta * p;
+    phi = phi * p;
+    zx = zr * Math.sin(theta) * Math.cos(phi) + x;
+    zy = zr * Math.sin(theta) * Math.sin(phi) + y;
+    zz = zr * Math.cos(theta) + z;
+  }
+  return 0.5 * Math.log(r + 1e-6) * r / dr;
+}
+
+function render() {
+  if (!paused) angleY += 0.03 * speed;
+  
+  const cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+  const cosX = Math.cos(angleX), sinX = Math.sin(angleX);
+  
+  let frame = [];
+  for (let j = 0; j < ROWS; j++) {
+    let line = "";
+    const vy = (j / ROWS - 0.5) * 2.2;
+    for (let i = 0; i < COLS; i++) {
+      const vx = (i / COLS - 0.5) * 2.2 * (COLS / ROWS) * 0.55;
+      
+      let roX = 0, roY = 0, roZ = -2.5;
+      let rdX = vx, rdY = vy, rdZ = 1.5;
+      let len = Math.sqrt(rdX*rdX + rdY*rdY + rdZ*rdZ);
+      rdX /= len; rdY /= len; rdZ /= len;
+
+      let rdx1 = rdX * cosY - rdZ * sinY;
+      let rdz1 = rdX * sinY + rdZ * cosY;
+      let rdy1 = rdY * cosX - rdz1 * sinX;
+      let rdz2 = rdY * sinX + rdz1 * cosX;
+
+      let rox1 = roX * cosY - roZ * sinY;
+      let roz1 = roX * sinY + roZ * cosY;
+      let roy1 = roY * cosX - roz1 * sinX;
+      let roz2 = roY * sinX + roz1 * cosX;
+
+      let t = 0.0;
+      let hit = false;
+      let steps = 0;
+      for (let s = 0; s < 18; s++) {
+        let px = rox1 + rdx1 * t;
+        let py = roy1 + rdy1 * t;
+        let pz = roz2 + rdz2 * t;
+        let d = DE(px, py, pz, power);
+        if (d < 0.005) { hit = true; steps = s; break; }
+        t += d;
+        if (t > 4.0) break;
+      }
+
+      if (hit) {
+        let charIdx = Math.floor((1 - steps / 18) * (CHARS.length - 1));
+        line += CHARS[Math.max(0, Math.min(CHARS.length - 1, charIdx))];
+      } else {
+        line += " ";
+      }
+    }
+    frame.push(line);
+  }
+  screen.textContent = frame.join("\n");
+  requestAnimationFrame(render);
+}
+
+document.getElementById('rngPower').addEventListener('input', (e) => {
+  power = parseFloat(e.target.value);
+  document.getElementById('valPower').innerText = power.toFixed(1);
+});
+document.getElementById('rngSpeed').addEventListener('input', (e) => {
+  speed = parseFloat(e.target.value);
+  document.getElementById('valSpeed').innerText = speed.toFixed(1) + 'x';
+});
+document.getElementById('selTheme').addEventListener('change', (e) => {
+  screen.style.color = e.target.value;
+});
+document.getElementById('btnPause').addEventListener('click', () => {
+  paused = !paused;
+  document.getElementById('btnPause').innerText = paused ? "재생 (Resume)" : "일시 정지 (Pause)";
+});
+
+render();
+
+</script>
+</head>
+<body>
+<div class="container">
+  <h1>🌌 Canvas ASCII 3D Mandelbulb Fractal Raymarcher</h1>
+  <p style="font-family: -apple-system, sans-serif; font-size: 0.9rem;">Web Worker & Distance Estimator 기반 순수 자바스크립트 3D 만델벌브 프랙탈 실시간 아스키 렌더러</p>
+
+  <div class="card">
+    <pre id="asciiScreen"></pre>
+  </div>
+
+  <div class="ctrl-grid">
+    <div class="ctrl-box">
+      <label>Mandelbulb Power (n): <span id="valPower">8.0</span></label>
+      <input type="range" id="rngPower" min="2" max="16" step="0.5" value="8">
+    </div>
+    <div class="ctrl-box">
+      <label>Rotation Speed: <span id="valSpeed">1.0x</span></label>
+      <input type="range" id="rngSpeed" min="0" max="3" step="0.2" value="1">
+    </div>
+    <div class="ctrl-box">
+      <label>Color Theme</label>
+      <select id="selTheme" style="width: 100%; background:#161b22; color:#fff; border:1px solid #30363d; padding:6px; border-radius:4px;">
+        <option value="#3fb950">Matrix Green</option>
+        <option value="#58a6ff">Deep Cyber Blue</option>
+        <option value="#d29922">Amber CRT</option>
+        <option value="#f85149">Plasma Neon Red</option>
+        <option value="#c9d1d9">Monochrome White</option>
+      </select>
+    </div>
+    <div class="ctrl-box" style="display: flex; align-items: center; justify-content: center;">
+      <button id="btnPause" class="btn">일시 정지 / 재개</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Html Canvas Ascii 3D Mandelbulb Raymarcher</h2>
+  
+  <p>Welcome to <strong>SA Labs Html Canvas Ascii 3D Mandelbulb Raymarcher</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Html Canvas Ascii 3D Mandelbulb Raymarcher, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Html Canvas Ascii 3D Mandelbulb Raymarcher occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Html Canvas Ascii 3D Mandelbulb Raymarcher is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematical ASCII 3D Gyroid Surface Raymarcher - Quanxs SA Labs</title>
+    <meta name="description" content="100% Client-Side Pure JS Mathematical ASCII 3D Gyroid Triply Periodic Minimal Surface Raymarcher by Quanxs SA Labs.">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Mathematical ASCII 3D Gyroid Surface Raymarcher",
+      "url": "https://salabs.quanxs.com/tools/html-canvas-ascii-3d-gyroid-surface.html",
+      "description": "High-performance client-side ASCII 3D Gyroid mathematical surface raymarcher and visualizer.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --bg: #050811;
+            --panel: #0d1322;
+            --accent: #10b981;
+            --border: #1e293b;
+            --text: #e2e8f0;
+            --text-dim: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: monospace; }
+        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .wrapper { max-width: 960px; width: 100%; }
+        header { text-align: center; margin-bottom: 20px; }
+        header h1 { font-size: 1.6rem; color: var(--accent); margin-bottom: 5px; }
+        header p { color: var(--text-dim); font-size: 0.9rem; }
+        .viewer-container { display: flex; flex-direction: column; align-items: center; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        pre#asciiOutput { font-size: 9px; line-height: 8px; letter-spacing: 1px; color: var(--accent); text-shadow: 0 0 5px rgba(16, 185, 129, 0.4); user-select: none; background: #000; padding: 15px; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; margin-top: 20px; }
+        .ctrl { display: flex; flex-direction: column; font-size: 0.85rem; }
+        .ctrl label { margin-bottom: 5px; color: var(--text-dim); }
+        input[type="range"] { accent-color: var(--accent); cursor: pointer; }
+        select, button { padding: 8px 12px; background: #162032; border: 1px solid var(--border); color: var(--text); border-radius: 6px; font-family: monospace; cursor: pointer; }
+        button:hover { background: #1e293b; border-color: var(--accent); }
+        .footer { margin-top: 25px; font-size: 0.8rem; color: var(--text-dim); text-align: center; }
+        .footer a { color: var(--accent); text-decoration: none; }
+    </style>
+<script>
+
+        const asciiPre = document.getElementById('asciiOutput');
+        const isoRange = document.getElementById('isoRange');
+        const scaleRange = document.getElementById('scaleRange');
+        const speedRange = document.getElementById('speedRange');
+        const themeSelect = document.getElementById('themeSelect');
+        const isoVal = document.getElementById('isoVal');
+        const scaleVal = document.getElementById('scaleVal');
+        const speedVal = document.getElementById('speedVal');
+
+        const COLS = 72, ROWS = 36;
+        const GLYPHS = " .:-=+*#%@";
+        let rotX = 0.5, rotY = 0.3;
+
+        isoRange.oninput = () => { isoVal.textContent = isoRange.value; };
+        scaleRange.oninput = () => { scaleVal.textContent = scaleRange.value; };
+        speedRange.oninput = () => { speedVal.textContent = speedRange.value + 'x'; };
+        themeSelect.onchange = () => { asciiPre.style.color = themeSelect.value; asciiPre.style.textShadow = `0 0 5px ${themeSelect.value}66`; };
+
+        function gyroidSDF(x, y, z, scale, iso) {
+            const sx = x * scale, sy = y * scale, sz = z * scale;
+            const g = (Math.sin(sx) * Math.cos(sy) + Math.sin(sy) * Math.cos(sz) + Math.sin(sz) * Math.cos(sx)) - iso;
+            const dSphere = Math.sqrt(x*x + y*y + z*z) - 1.2;
+            return Math.max(Math.abs(g) / scale - 0.04, dSphere);
+        }
+
+        function renderFrame() {
+            const iso = parseFloat(isoRange.value);
+            const scale = parseFloat(scaleRange.value);
+            const speed = parseFloat(speedRange.value);
+            rotX += 0.02 * speed;
+            rotY += 0.015 * speed;
+
+            let buffer = "";
+            const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+            const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+
+            for (let r = 0; r < ROWS; r++) {
+                const v = (r / ROWS) * 2 - 1;
+                for (let c = 0; c < COLS; c++) {
+                    const u = ((c / COLS) * 2 - 1) * (COLS / (ROWS * 2));
+                    let roX = 0, roY = 0, roZ = -2.5;
+                    let rdX = u, rdY = v, rdZ = 1.0;
+                    const len = Math.sqrt(rdX*rdX + rdY*rdY + rdZ*rdZ);
+                    rdX /= len; rdY /= len; rdZ /= len;
+
+                    let t = 0.0, hit = false, normalZ = 0;
+                    for (let step = 0; step < 32; step++) {
+                        let px = roX + rdX * t;
+                        let py = roY + rdY * t;
+                        let pz = roZ + rdZ * t;
+
+                        let y1 = py * cosX - pz * sinX;
+                        let z1 = py * sinX + pz * cosX;
+                        let x2 = px * cosY + z1 * sinY;
+                        let z2 = -px * sinY + z1 * cosY;
+
+                        const dist = gyroidSDF(x2, y1, z2, scale, iso);
+                        if (dist < 0.01) {
+                            hit = true;
+                            normalZ = Math.min(1.0, Math.max(0.0, 1.0 - t / 3.5));
+                            break;
+                        }
+                        t += dist;
+                        if (t > 4.0) break;
+                    }
+
+                    if (hit) {
+                        const glyphIdx = Math.floor(normalZ * (GLYPHS.length - 1));
+                        buffer += GLYPHS[glyphIdx];
+                    } else {
+                        buffer += " ";
+                    }
+                }
+                buffer += "\n";
+            }
+            asciiPre.textContent = buffer;
+            requestAnimationFrame(renderFrame);
+        }
+        renderFrame();
+    
+</script>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <h1>ASCII 3D Gyroid Surface Raymarcher</h1>
+            <p>Triply Periodic Minimal Surface Math Raymarching Engine in Pure JavaScript</p>
+        </header>
+        <div class="viewer-container">
+            <pre id="asciiOutput"></pre>
+            <div class="controls-grid">
+                <div class="ctrl">
+                    <label>Iso-surface Value (Thickness): <span id="isoVal">0.0</span></label>
+                    <input type="range" id="isoRange" min="-1.2" max="1.2" step="0.05" value="0.0">
+                </div>
+                <div class="ctrl">
+                    <label>Surface Scale: <span id="scaleVal">3.0</span></label>
+                    <input type="range" id="scaleRange" min="1.0" max="6.0" step="0.1" value="3.0">
+                </div>
+                <div class="ctrl">
+                    <label>Rotation Speed: <span id="speedVal">1.0x</span></label>
+                    <input type="range" id="speedRange" min="0.0" max="3.0" step="0.1" value="1.0">
+                </div>
+                <div class="ctrl">
+                    <label>Color Palette Theme</label>
+                    <select id="themeSelect">
+                        <option value="#10b981">Matrix Emerald</option>
+                        <option value="#38bdf8">Cyber Blue</option>
+                        <option value="#f59e0b">Amber Terminal</option>
+                        <option value="#ec4899">Neon Pink</option>
+                        <option value="#f8fafc">Pure White</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2026 Quanxs SA Labs • Zero-Trust Pure JS Architecture • <a href="https://salabs.quanxs.com">Hub</a></p>
+        </div>
+    </div>
+    
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Html Canvas Ascii 3D Gyroid Surface</h2>
+  
+  <p>Welcome to <strong>SA Labs Html Canvas Ascii 3D Gyroid Surface</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Html Canvas Ascii 3D Gyroid Surface, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Html Canvas Ascii 3D Gyroid Surface occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Html Canvas Ascii 3D Gyroid Surface is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

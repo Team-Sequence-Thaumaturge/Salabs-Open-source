@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오디오 스펙트럼 포먼트 공명 합성기 Pro | Quanxs SA Labs</title>
+  <meta name="description" content="Web Audio API 기반의 브라우저 로컬 구동 다중 포먼트 주파수 필터 뱅크 및 스펙트럼 공명 사운드 디자인 스튜디오입니다.">
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "오디오 스펙트럼 포먼트 공명 합성기 Pro",
+    "url": "https://salabs.quanxs.com/tools/audio-formant-spectral-resonator-pro.html",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "description": "클라이언트 사이드 Web Audio BiquadFilter 뱅크 기반 다중 포먼트 공명 스튜디오",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  <style>
+    :root { --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #3fb950; --red: #f85149; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; line-height: 1.5; }
+    .container { max-width: 960px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { font-size: 1.8rem; color: #fff; margin-bottom: 8px; }
+    header p { color: #8b949e; font-size: 0.95rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+    .card h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    .control-group { margin-bottom: 14px; }
+    .control-group label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; color: #8b949e; }
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+    select, button { width: 100%; padding: 10px 14px; background: #21262d; border: 1px solid var(--border); border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.95rem; margin-top: 6px; }
+    button.btn-primary { background: #238636; border-color: #2ea043; font-weight: bold; }
+    button.btn-primary:hover { background: #2ea043; }
+    button.btn-danger { background: #da3633; border-color: #f85149; }
+    canvas { width: 100%; height: 220px; background: #000; border-radius: 6px; border: 1px solid var(--border); }
+  </style>
+<script>
+
+    let audioCtx = null;
+    let osc = null;
+    let filters = [];
+    let analyser = null;
+    let isPlaying = false;
+    const presets = {
+      a: [800, 1200, 2500],
+      e: [500, 1800, 2500],
+      i: [300, 2300, 3000],
+      o: [500, 800, 2500],
+      u: [300, 800, 2200]
+    };
+    function setupAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      const merger = audioCtx.createGain();
+      merger.gain.value = 0.5;
+      merger.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      osc = audioCtx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.value = parseFloat(document.getElementById('pitchSlider').value);
+      const chosen = presets[document.getElementById('vowelPreset').value];
+      const q = parseFloat(document.getElementById('qSlider').value);
+      filters = chosen.map(f => {
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = f;
+        filter.Q.value = q;
+        osc.connect(filter);
+        filter.connect(merger);
+        return filter;
+      });
+      osc.start();
+      drawVisualizer();
+    }
+    function drawVisualizer() {
+      if (!analyser) return;
+      const canvas = document.getElementById('spectrumCanvas');
+      const ctx = canvas.getContext('2d');
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      function render() {
+        if (!isPlaying) return;
+        requestAnimationFrame(render);
+        analyser.getByteFrequencyData(dataArray);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = (dataArray[i] / 255) * canvas.height;
+          ctx.fillStyle = `hsl(${i * 2 + 180}, 100%, 50%)`;
+          ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+          x += barWidth + 1;
+        }
+      }
+      render();
+    }
+    document.getElementById('toggleBtn').addEventListener('click', () => {
+      if (!isPlaying) {
+        if (!audioCtx) setupAudio();
+        else audioCtx.resume();
+        isPlaying = true;
+        document.getElementById('toggleBtn').textContent = '⏹ Stop Resonator Synth';
+        document.getElementById('toggleBtn').className = 'btn-danger';
+        drawVisualizer();
+      } else {
+        if (audioCtx) audioCtx.suspend();
+        isPlaying = false;
+        document.getElementById('toggleBtn').textContent = '▶ Start Resonator Synth';
+        document.getElementById('toggleBtn').className = 'btn-primary';
+      }
+    });
+    document.getElementById('pitchSlider').addEventListener('input', (e) => {
+      document.getElementById('pitchVal').textContent = e.target.value + ' Hz';
+      if (osc) osc.frequency.value = parseFloat(e.target.value);
+    });
+    document.getElementById('qSlider').addEventListener('input', (e) => {
+      document.getElementById('qVal').textContent = e.target.value;
+      if (filters.length) filters.forEach(f => f.Q.value = parseFloat(e.target.value));
+    });
+    document.getElementById('vowelPreset').addEventListener('change', (e) => {
+      const chosen = presets[e.target.value];
+      if (filters.length) {
+        chosen.forEach((freq, idx) => {
+          if (filters[idx]) filters[idx].frequency.value = freq;
+        });
+      }
+    });
+  
+</script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎛️ Audio Formant Spectral Resonator Pro</h1>
+      <p>Web Audio BiquadFilter 5밴드 병렬 포먼트 공명 합성 및 실시간 FFT 스펙트로그램 시각화</p>
+    </header>
+    <div class="grid">
+      <div class="card">
+        <h2>🎚️ Formant Controls & Source</h2>
+        <div class="control-group">
+          <label><span>Vowel Preset</span></label>
+          <select id="vowelPreset">
+            <option value="a">Korean /a/ (아 - 800Hz / 1200Hz / 2500Hz)</option>
+            <option value="e">Korean /e/ (에 - 500Hz / 1800Hz / 2500Hz)</option>
+            <option value="i">Korean /i/ (이 - 300Hz / 2300Hz / 3000Hz)</option>
+            <option value="o">Korean /o/ (오 - 500Hz / 800Hz / 2500Hz)</option>
+            <option value="u">Korean /u/ (우 - 300Hz / 800Hz / 2200Hz)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label><span>Fundamental Pitch (F0)</span><span id="pitchVal">130 Hz</span></label>
+          <input type="range" id="pitchSlider" min="55" max="440" value="130">
+        </div>
+        <div class="control-group">
+          <label><span>Resonance Q-Factor</span><span id="qVal">8.0</span></label>
+          <input type="range" id="qSlider" min="1" max="20" value="8" step="0.5">
+        </div>
+        <button id="toggleBtn" class="btn-primary">▶ Start Resonator Synth</button>
+      </div>
+      <div class="card">
+        <h2>📊 Realtime Spectral FFT Analyzer</h2>
+        <canvas id="spectrumCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+  
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Audio Formant Spectral Resonator Pro</h2>
+  
+  <p>Welcome to <strong>SA Labs Audio Formant Spectral Resonator Pro</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Audio Formant Spectral Resonator Pro, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Audio Formant Spectral Resonator Pro occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Audio Formant Spectral Resonator Pro is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

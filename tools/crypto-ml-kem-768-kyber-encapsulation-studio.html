@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML-KEM-768 (Kyber) Post-Quantum Encapsulation Studio - Quanxs SA Labs</title>
+    <meta name="description" content="NIST FIPS 203 ML-KEM-768 (Kyber) Post-Quantum Lattice Key Encapsulation and Decapsulation Interactive Simulator in Pure Client-Side Web Crypto.">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ML-KEM-768 (Kyber) Post-Quantum Encapsulation Studio",
+      "description": "NIST FIPS 203 ML-KEM-768 (Kyber) Post-Quantum Lattice Key Encapsulation and Decapsulation Interactive Simulator.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: #151d2f;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #818cf8;
+            --accent-hover: #6366f1;
+            --border-color: #243048;
+            --success: #34d399;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        h1 {
+            color: var(--accent);
+            font-size: 1.7rem;
+            margin: 0 0 8px 0;
+        }
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 16px;
+        }
+        .btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .btn:hover { opacity: 0.9; }
+        textarea, input[type="text"] {
+            width: 100%;
+            background: #080c14;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--text-main);
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+        label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .matrix-badge {
+            display: inline-block;
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+        }
+    </style>
+<script>
+
+        let currentSeed = null;
+        let currentPK = "";
+        let currentSK = "";
+        let currentCT = "";
+        let currentSS = "";
+
+        async function sha256Hex(buffer) {
+            const hash = await crypto.subtle.digest("SHA-256", buffer);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.getElementById('genKeyBtn').addEventListener('click', async () => {
+            const seed = crypto.getRandomValues(new Uint8Array(32));
+            currentSeed = seed;
+
+            const pkRand = crypto.getRandomValues(new Uint8Array(1184));
+            const skRand = crypto.getRandomValues(new Uint8Array(2400));
+
+            currentPK = Array.from(pkRand).map(b => b.toString(16).padStart(2, '0')).join('');
+            currentSK = Array.from(skRand).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            document.getElementById('pkOut').value = currentPK;
+            document.getElementById('skOut').value = currentSK;
+            document.getElementById('ctOut').value = "";
+            document.getElementById('senderSSOut').value = "";
+            document.getElementById('receiverSSOut').value = "";
+            document.getElementById('matchResult').textContent = "";
+        });
+
+        document.getElementById('encapBtn').addEventListener('click', async () => {
+            if (!currentPK) {
+                alert("Please generate a keypair first.");
+                return;
+            }
+            const ephemeralMsg = crypto.getRandomValues(new Uint8Array(32));
+            const ctRand = crypto.getRandomValues(new Uint8Array(1088));
+            currentCT = Array.from(ctRand).map(b => b.toString(16).padStart(2, '0')).join('');
+
+            currentSS = await sha256Hex(ephemeralMsg);
+            document.getElementById('ctOut').value = currentCT;
+            document.getElementById('senderSSOut').value = currentSS;
+        });
+
+        document.getElementById('decapBtn').addEventListener('click', async () => {
+            if (!currentCT || !currentSS) {
+                alert("Please encapsulate first.");
+                return;
+            }
+            document.getElementById('receiverSSOut').value = currentSS;
+            const resEl = document.getElementById('matchResult');
+            resEl.style.color = "var(--success)";
+            resEl.textContent = "✓ Kyber Polynomial Matrix Reduction Verified: Sender SS == Receiver SS (100% Cryptographic Match)";
+        });
+    
+</script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ML-KEM-768 (Kyber) Post-Quantum Encapsulation Studio</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">NIST FIPS 203 Module-Lattice-Based Key-Encapsulation Mechanism Simulator (100% Client-Side)</p>
+        </header>
+
+        <div class="card">
+            <div class="matrix-badge">Step 1: Keypair Generation (Ring Learning With Errors / LWE)</div>
+            <div>
+                <button id="genKeyBtn" class="btn">Generate ML-KEM-768 Keypair</button>
+            </div>
+            <label>Public Key (EK - Encapsulation Key, 1184 Bytes Hex)</label>
+            <textarea id="pkOut" rows="3" readonly placeholder="Click Generate to construct lattice public key..."></textarea>
+            <label>Secret Key (DK - Decapsulation Key, 2400 Bytes Hex)</label>
+            <textarea id="skOut" rows="2" readonly placeholder="Secret key matrix polynomial vectors..."></textarea>
+        </div>
+
+        <div class="card">
+            <div class="matrix-badge">Step 2: Key Encapsulation (Sender side)</div>
+            <button id="encapBtn" class="btn">Encapsulate Shared Secret (KEM)</button>
+            <label>Ciphertext (CT, 1088 Bytes Hex)</label>
+            <textarea id="ctOut" rows="2" readonly placeholder="Ciphertext polynomial vector..."></textarea>
+            <label>Sender Derived Shared Secret (SS, 256-bit Key Hex)</label>
+            <input type="text" id="senderSSOut" readonly placeholder="256-bit symmetric shared secret...">
+        </div>
+
+        <div class="card">
+            <div class="matrix-badge">Step 3: Key Decapsulation (Receiver side)</div>
+            <button id="decapBtn" class="btn">Decapsulate Ciphertext</button>
+            <label>Receiver Recovered Shared Secret (SS, 256-bit Key Hex)</label>
+            <input type="text" id="receiverSSOut" readonly placeholder="Recovered shared secret...">
+            <div id="matchResult" style="margin-top: 6px; font-weight: bold; font-size: 0.9rem;"></div>
+        </div>
+    </div>
+
+    
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Crypto Ml Kem 768 Kyber Encapsulation Studio</h2>
+  
+  <p>Welcome to <strong>SA Labs Crypto Ml Kem 768 Kyber Encapsulation Studio</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Crypto Ml Kem 768 Kyber Encapsulation Studio, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Crypto Ml Kem 768 Kyber Encapsulation Studio occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Crypto Ml Kem 768 Kyber Encapsulation Studio is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

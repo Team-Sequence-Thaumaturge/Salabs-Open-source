@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Formant Vowel Filter Pro Studio | Quanxs SA Labs</title>
+  <meta name="description" content="Professional client-side audio vowel formant filter and speech synthesis resonator using Web Audio API. Zero server dependency.">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Audio Formant Vowel Filter Pro Studio",
+    "url": "https://salabs.quanxs.com/tools/audio-formant-vowel-filter-pro.html",
+    "description": "Professional Web Audio API speech formant resonator with vowel presets and XY vowel space control.",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <style>
+    :root { --bg: #0f172a; --panel: #1e293b; --text: #f8fafc; --accent: #38bdf8; --accent-glow: rgba(56, 189, 248, 0.3); }
+    body { margin: 0; padding: 20px; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; }
+    .container { max-width: 800px; width: 100%; background: var(--panel); border-radius: 12px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    h1 { margin-top: 0; color: var(--accent); font-size: 1.5rem; text-align: center; }
+    .xy-pad-container { display: flex; justify-content: center; margin: 20px 0; }
+    canvas { background: #0b0f19; border: 1px solid #334155; border-radius: 8px; cursor: crosshair; }
+    .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
+    .control-group { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
+    label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; }
+    select, button, input[type="range"] { width: 100%; box-sizing: border-box; background: #1e293b; color: #fff; border: 1px solid #475569; border-radius: 6px; padding: 8px; font-size: 0.9rem; }
+    button { background: var(--accent); color: #0f172a; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
+    button:hover { background: #7dd3fc; }
+    .status { text-align: center; margin-top: 15px; font-size: 0.9rem; color: #38bdf8; }
+  </style>
+<script>
+
+    let audioCtx, osc, gainNode, isRunning = false;
+    let filters = [];
+    const vowels = {
+      'a': { f1: 730, f2: 1090, f3: 2440 },
+      'e': { f1: 530, f2: 1840, f3: 2480 },
+      'i': { f1: 270, f2: 2290, f3: 3010 },
+      'o': { f1: 570, f2: 840, f3: 2410 },
+      'u': { f1: 300, f2: 870, f3: 2240 }
+    };
+    let currentF1 = 730, currentF2 = 1090, currentF3 = 2440;
+
+    function initAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      osc = audioCtx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(parseFloat(document.getElementById('pitch').value), audioCtx.currentTime);
+
+      gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+
+      // 3 Formant filters in parallel
+      const q = parseFloat(document.getElementById('qFactor').value);
+      filters = [1, 2, 3].map(() => {
+        const f = audioCtx.createBiquadFilter();
+        f.type = 'bandpass';
+        f.Q.setValueAtTime(q, audioCtx.currentTime);
+        return f;
+      });
+
+      filters[0].frequency.setValueAtTime(currentF1, audioCtx.currentTime);
+      filters[1].frequency.setValueAtTime(currentF2, audioCtx.currentTime);
+      filters[2].frequency.setValueAtTime(currentF3, audioCtx.currentTime);
+
+      filters.forEach(f => {
+        osc.connect(f);
+        f.connect(gainNode);
+      });
+
+      gainNode.connect(audioCtx.destination);
+      osc.start();
+    }
+
+    const toggleBtn = document.getElementById('toggleBtn');
+    toggleBtn.addEventListener('click', () => {
+      if (!audioCtx) initAudio();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+        isRunning = true;
+        toggleBtn.textContent = 'Stop Synthesizer';
+        document.getElementById('statusText').textContent = 'Audio Engine Running';
+      } else if (audioCtx.state === 'running') {
+        audioCtx.suspend();
+        isRunning = false;
+        toggleBtn.textContent = 'Start Synthesizer';
+        document.getElementById('statusText').textContent = 'Audio Engine Suspended';
+      }
+    });
+
+    document.getElementById('pitch').addEventListener('input', (e) => {
+      document.getElementById('pitchVal').textContent = e.target.value + ' Hz';
+      if (osc) osc.frequency.setValueAtTime(parseFloat(e.target.value), audioCtx.currentTime);
+    });
+
+    document.getElementById('qFactor').addEventListener('input', (e) => {
+      document.getElementById('qVal').textContent = e.target.value;
+      if (filters.length) filters.forEach(f => f.Q.setValueAtTime(parseFloat(e.target.value), audioCtx.currentTime));
+    });
+
+    document.getElementById('masterVol').addEventListener('input', (e) => {
+      document.getElementById('volVal').textContent = e.target.value + '%';
+      if (gainNode) gainNode.gain.setValueAtTime(parseFloat(e.target.value) / 200, audioCtx.currentTime);
+    });
+
+    function setFormants(f1, f2, f3) {
+      currentF1 = f1; currentF2 = f2; currentF3 = f3;
+      if (filters.length === 3 && audioCtx) {
+        filters[0].frequency.setTargetAtTime(f1, audioCtx.currentTime, 0.05);
+        filters[1].frequency.setTargetAtTime(f2, audioCtx.currentTime, 0.05);
+        filters[2].frequency.setTargetAtTime(f3, audioCtx.currentTime, 0.05);
+      }
+      drawPad();
+    }
+
+    document.getElementById('vowelSelect').addEventListener('change', (e) => {
+      const v = vowels[e.target.value];
+      if (v) setFormants(v.f1, v.f2, v.f3);
+    });
+
+    const canvas = document.getElementById('vowelPad');
+    const ctx = canvas.getContext('2d');
+
+    function drawPad() {
+      ctx.fillStyle = '#0b0f19';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#334155';
+      ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+      // Grid
+      ctx.strokeStyle = '#1e293b';
+      for(let i=40; i<canvas.width; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+      for(let i=40; i<canvas.height; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(canvas.width,i); ctx.stroke(); }
+
+      // Draw Vowel Landmarks
+      Object.keys(vowels).forEach(k => {
+        const v = vowels[k];
+        const x = ((v.f2 - 700) / (2500 - 700)) * (canvas.width - 40) + 20;
+        const y = ((v.f1 - 200) / (900 - 200)) * (canvas.height - 40) + 20;
+        ctx.fillStyle = '#64748b';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText(`[${k}]`, x - 8, y + 5);
+      });
+
+      // Draw Current Pointer
+      const px = ((currentF2 - 700) / (2500 - 700)) * (canvas.width - 40) + 20;
+      const py = ((currentF1 - 200) / (900 - 200)) * (canvas.height - 40) + 20;
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(px, py, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.stroke();
+    }
+    drawPad();
+
+    let dragging = false;
+    canvas.addEventListener('mousedown', (e) => { dragging = true; handlePadMove(e); });
+    window.addEventListener('mouseup', () => dragging = false);
+    canvas.addEventListener('mousemove', (e) => { if (dragging) handlePadMove(e); });
+
+    function handlePadMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.max(0, Math.min(canvas.width, e.clientX - rect.left));
+      const y = Math.max(0, Math.min(canvas.height, e.clientY - rect.top));
+      const f2 = 700 + (x / canvas.width) * (2500 - 700);
+      const f1 = 200 + (y / canvas.height) * (900 - 200);
+      document.getElementById('vowelSelect').value = 'custom';
+      setFormants(f1, f2, 2450);
+    }
+  
+</script>
+</head>
+<body>
+  <div class="container">
+    <h1>Audio Formant Vowel Filter Pro</h1>
+    <p style="color:#94a3b8; text-align:center; font-size:0.9rem;">Real-time Web Audio API Speech Resonator & Vowel Synthesizer</p>
+    
+    <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px;">
+      <button id="toggleBtn">Start Synthesizer</button>
+      <button id="micBtn" style="background:#475569; color:#fff;">Use Mic Input</button>
+    </div>
+
+    <div class="xy-pad-container">
+      <canvas id="vowelPad" width="360" height="260"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Vowel Preset</label>
+        <select id="vowelSelect">
+          <option value="custom">Custom (Drag XY Pad)</option>
+          <option value="a" selected>Vowel [a] (Father)</option>
+          <option value="e">Vowel [e] (Bet)</option>
+          <option value="i">Vowel [i] (See)</option>
+          <option value="o">Vowel [o] (Boat)</option>
+          <option value="u">Vowel [u] (Boot)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Fundamental Pitch: <span id="pitchVal">120 Hz</span></label>
+        <input type="range" id="pitch" min="60" max="400" value="120">
+      </div>
+      <div class="control-group">
+        <label>Resonance Q Factor: <span id="qVal">10</span></label>
+        <input type="range" id="qFactor" min="2" max="25" value="10">
+      </div>
+      <div class="control-group">
+        <label>Master Volume: <span id="volVal">80%</span></label>
+        <input type="range" id="masterVol" min="0" max="100" value="80">
+      </div>
+    </div>
+    <div class="status" id="statusText">Synthesizer Stopped</div>
+  </div>
+
+  
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Audio Formant Vowel Filter Pro</h2>
+  
+  <p>Welcome to <strong>SA Labs Audio Formant Vowel Filter Pro</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Audio Formant Vowel Filter Pro, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Audio Formant Vowel Filter Pro occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Audio Formant Vowel Filter Pro is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

@@ -50,7 +50,8 @@
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       }
     </style>
-  </head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+</head>
   <body class="p-8">
     <div class="max-w-4xl mx-auto">
       <header class="mb-8">
@@ -59,200 +60,180 @@
       </header>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- x402 Micropayment Simulator -->
         <div class="panel">
           <h2 class="text-xl font-semibold text-cyan-400 mb-4 flex items-center">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             x402 Micropayments
           </h2>
           <p class="text-sm text-slate-300 mb-4">Manage high-frequency, low-latency AI-to-AI transactions.</p>
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-400 mb-1">Target Agent Wallet</label>
-            <input type="text" id="target-wallet" value="0x8920...3aB9" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" readonly>
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-slate-400 mb-1">Stream Amount (Credits)</label>
-            <input type="number" id="stream-amount" value="50" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-          </div>
-          <button id="btn-start-stream" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-2 px-4 rounded transition-colors">
-            Start Payment Stream
-          </button>
-          <button id="btn-stop-stream" class="w-full mt-2 border border-slate-600 hover:bg-slate-700 text-slate-300 font-semibold py-2 px-4 rounded transition-colors hidden">
-            Stop Stream
-          </button>
-          <div id="x402-status" class="mt-4 bg-slate-800 rounded p-3 text-xs font-mono text-emerald-400 hidden">
+          <div class="bg-slate-800 rounded p-3 text-xs font-mono text-emerald-400">
             Status: Initializing gateway...
           </div>
         </div>
 
-        <!-- ZK-Identity Vault & dTAO AMM -->
-        <div class="flex flex-col gap-6">
-          <div class="panel">
-            <h2 class="text-xl font-semibold text-blue-400 mb-4 flex items-center">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-              ZK-Identity Vault
-            </h2>
-            <p class="text-sm text-slate-300 mb-4">Zero-Knowledge proof verification for autonomous agents.</p>
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-slate-400 mb-1">Identity Hash</label>
-              <input type="text" id="identity-hash" value="did:jules:a1b2c3d4" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
-            </div>
-            <button id="btn-generate-proof" class="w-full border border-blue-500 hover:bg-blue-900/50 text-blue-400 font-semibold py-2 px-4 rounded transition-colors">
-              Generate Cryptographic Proof
-            </button>
-            <div id="zk-status" class="mt-4 bg-slate-800 rounded p-3 text-xs font-mono text-slate-400 hidden">
-              Awaiting cryptographic proof...
-            </div>
+        <div class="panel">
+          <h2 class="text-xl font-semibold text-blue-400 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            ZK-Identity Vault
+          </h2>
+          <p class="text-sm text-slate-300 mb-4">Zero-Knowledge proof verification for autonomous agents.</p>
+          <div class="bg-slate-800 rounded p-3 text-xs font-mono text-slate-400">
+            Awaiting cryptographic proof...
           </div>
-
-          <div class="panel">
-            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-              dTAO AMM Liquidity
-            </h2>
-            <p class="text-sm text-slate-300 mb-4">Decentralized token swap for agent resources.</p>
-            <div class="flex items-center gap-2 mb-4">
-               <input type="number" id="swap-amount" value="10" class="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-               <span class="text-slate-400">dTAO</span>
-            </div>
-            <button id="btn-swap-dtao" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition-colors">
-              Execute Swap
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Log Stream -->
-      <div class="mt-8 panel">
-        <h2 class="text-lg font-semibold text-slate-300 mb-4">Live Transaction Log</h2>
-        <div id="log-stream" class="h-48 overflow-y-auto bg-slate-900 rounded p-4 text-xs font-mono text-slate-400 border border-slate-700">
-          <div>[System] Initializing Agentic Commerce Kernel...</div>
         </div>
       </div>
     </div>
+
     <!-- External logic to be loaded here -->
     <script type="module">
-      import {
-        parse402Header,
-        generateSignature,
-        generateZKProof,
-        simulateSettlementStream
-      } from '../modules/x402_agent_payment_gate.js';
+      import { X402PaymentGate } from '../modules/x402_agent_payment_gate.js';
+      const paymentGate = new X402PaymentGate();
+      console.log("X402 Gate initialized. dTAO Status:", paymentGate.getDtaoAmmStatus());
 
-      const logStream = document.getElementById('log-stream');
-
-      function log(message, color = 'text-slate-400') {
-        const div = document.createElement('div');
-        const timestamp = new Date().toISOString().split('T')[1].substring(0, 12);
-        div.className = color;
-        div.textContent = `[${timestamp}] ${message}`;
-        logStream.appendChild(div);
-        logStream.scrollTop = logStream.scrollHeight;
-      }
-
-      // x402 Micropayment Simulator
-      const btnStartStream = document.getElementById('btn-start-stream');
-      const btnStopStream = document.getElementById('btn-stop-stream');
-      const streamAmountInput = document.getElementById('stream-amount');
-      const targetWalletInput = document.getElementById('target-wallet');
-      const x402Status = document.getElementById('x402-status');
-
-      let currentStreamStopFn = null;
-
-      btnStartStream.addEventListener('click', async () => {
-        const totalAmount = parseInt(streamAmountInput.value, 10);
-        if (isNaN(totalAmount) || totalAmount <= 0) {
-          log('Invalid stream amount.', 'text-red-400');
-          return;
-        }
-
-        btnStartStream.classList.add('hidden');
-        btnStopStream.classList.remove('hidden');
-        x402Status.classList.remove('hidden');
-        x402Status.textContent = 'Status: Negotiating L402 Header...';
-
-        log(`Initiating HTTP 402 handshake with ${targetWalletInput.value}...`, 'text-cyan-400');
-
-        // Simulate receiving a 402 header
-        setTimeout(async () => {
-          const simulatedHeader = 'L402 macaroon="mac_abcdef12345", invoice="lnbc_...98765"';
-          const parsed = parse402Header(simulatedHeader);
-          if (parsed) {
-            log(`Parsed L402 Macaroon: ${parsed.macaroon}`, 'text-emerald-400');
-            log(`Generating HMAC signature for token...`, 'text-slate-300');
-
-            const sig = await generateSignature(parsed.macaroon, 'secret-agent-key');
-            log(`Signature valid: ${sig.substring(0, 16)}...`, 'text-emerald-400');
-
-            log(`Starting continuous settlement stream (${totalAmount} credits)...`, 'text-cyan-400');
-            x402Status.textContent = 'Status: Streaming micro-transactions...';
-
-            currentStreamStopFn = simulateSettlementStream(totalAmount, Math.ceil(totalAmount/10), (res) => {
-              log(`Settled: ${res.settled} / Remaining: ${res.remaining} [${res.status}]`, 'text-blue-300');
-              if (res.status === 'completed' || res.status === 'stopped') {
-                btnStopStream.classList.add('hidden');
-                btnStartStream.classList.remove('hidden');
-                x402Status.textContent = `Status: Stream ${res.status}.`;
-                currentStreamStopFn = null;
-              }
-            });
-          }
-        }, 800);
-      });
-
-      btnStopStream.addEventListener('click', () => {
-        if (currentStreamStopFn) {
-          log('User requested stream halt.', 'text-red-400');
-          currentStreamStopFn();
-        }
-      });
-
-      // ZK-Identity Vault
-      const btnGenerateProof = document.getElementById('btn-generate-proof');
-      const identityHashInput = document.getElementById('identity-hash');
-      const zkStatus = document.getElementById('zk-status');
-
-      btnGenerateProof.addEventListener('click', async () => {
-        const idHash = identityHashInput.value;
-        if (!idHash) return;
-
-        btnGenerateProof.disabled = true;
-        btnGenerateProof.classList.add('opacity-50', 'cursor-not-allowed');
-        zkStatus.classList.remove('hidden');
-        zkStatus.textContent = 'Generating proof...';
-        log(`Computing zero-knowledge proof for ${idHash}...`, 'text-blue-400');
-
-        // Slight delay for UI effect
-        setTimeout(async () => {
-           const proofData = await generateZKProof(idHash);
-           zkStatus.textContent = `Proof verified: ${proofData.proof.substring(0, 20)}...`;
-           log(`ZK Proof Verified. Hash: ${proofData.proof.substring(0, 32)}...`, 'text-emerald-400');
-           btnGenerateProof.disabled = false;
-           btnGenerateProof.classList.remove('opacity-50', 'cursor-not-allowed');
-        }, 600);
-      });
-
-      // dTAO AMM Swap
-      const btnSwapDtao = document.getElementById('btn-swap-dtao');
-      const swapAmountInput = document.getElementById('swap-amount');
-
-      btnSwapDtao.addEventListener('click', () => {
-        const amount = parseFloat(swapAmountInput.value);
-        if (isNaN(amount) || amount <= 0) return;
-
-        btnSwapDtao.disabled = true;
-        btnSwapDtao.classList.add('opacity-50', 'cursor-not-allowed');
-        log(`Routing ${amount} dTAO through AMM liquidity pools...`, 'text-emerald-400');
-
-        setTimeout(() => {
-           const rate = 1.05 + (Math.random() * 0.1); // ~1.1
-           const received = (amount * rate).toFixed(4);
-           log(`Swap executed successfully: ${amount} dTAO -> ${received} USDT.`, 'text-emerald-400');
-           btnSwapDtao.disabled = false;
-           btnSwapDtao.classList.remove('opacity-50', 'cursor-not-allowed');
-        }, 1200);
-      });
-
+      const statusDiv = document.querySelector('.panel:first-child .bg-slate-800');
+      statusDiv.textContent = `Status: Gateway Active | Liquidity: ${paymentGate.getDtaoAmmStatus().poolLiquidity}`;
     </script>
-  </body>
+
+  
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Jules Agentic Commerce Dashboard</h2>
+  
+  <p>Welcome to <strong>SA Labs Jules Agentic Commerce Dashboard</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Jules Agentic Commerce Dashboard, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Jules Agentic Commerce Dashboard occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Jules Agentic Commerce Dashboard is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
 </html>

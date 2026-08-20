@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Costa Minimal Surface ASCII / Canvas Studio | SA Labs</title>
+  <meta name="description" content="Real-time 3D Costa Minimal Surface generator and mathematical topological renderer in ASCII and Canvas. 100% Client-Side Pure JS.">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "3D Costa Minimal Surface ASCII / Canvas Studio",
+    "url": "https://salabs.quanxs.com/tools/html-canvas-ascii-3d-costa-minimal-surface.html",
+    "description": "Client-side interactive mathematical topological 3D Costa minimal surface visualizer.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript. Requires HTML5 Canvas support.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Quanxs SA Labs"
+    }
+  }
+  </script>
+  <style>
+    :root { --bg: #090d13; --panel: #121820; --border: #232d3d; --text: #d1d7e0; --accent: #388bfd; }
+    body { margin: 0; padding: 20px; font-family: monospace; background: var(--bg); color: var(--text); }
+    .container { max-width: 960px; margin: 0 auto; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+    h1 { margin-top: 0; color: var(--accent); font-size: 1.4rem; }
+    .viewport { background: #000; border: 1px solid var(--border); border-radius: 6px; display: flex; flex-direction: column; align-items: center; padding: 16px; margin: 20px 0; overflow-x: auto; }
+    pre { margin: 0; font-family: "Courier New", monospace; font-size: 11px; line-height: 11px; color: #58a6ff; white-space: pre; }
+    .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    label { display: flex; justify-content: space-between; font-size: 0.85rem; color: #8b949e; margin-bottom: 4px; }
+    input[type=range] { width: 100%; }
+    .mode-btn { background: var(--accent); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+  </style>
+<script>
+
+    const ascii = document.getElementById('asciiOutput');
+    const rx = document.getElementById('rx');
+    const ry = document.getElementById('ry');
+    const res = document.getElementById('res');
+    const pScale = document.getElementById('pScale');
+    const chars = " .:-=+*#%@";
+
+    function renderCosta() {
+      const W = 72, H = 34;
+      const b = new Array(W * H).fill(' ');
+      const zBuffer = new Array(W * H).fill(-1000);
+      const N = parseInt(res.value);
+      const scale = parseFloat(pScale.value) * 9;
+      const radX = (parseInt(rx.value) * Math.PI) / 180;
+      const radY = (parseInt(ry.value) * Math.PI) / 180;
+
+      for (let i = 0; i < N; i++) {
+        const u = (i / N) * Math.PI * 2;
+        for (let j = 0; j < N; j++) {
+          const v = ((j / N) - 0.5) * 3.0;
+          // Costa Surface Approximation Formula
+          const x0 = scale * (Math.cos(u) * Math.cosh(v) - (Math.cos(2*u)*Math.cosh(2*v))/3);
+          const y0 = scale * (Math.sin(u) * Math.cosh(v) + (Math.sin(2*u)*Math.cosh(2*v))/3);
+          const z0 = scale * (2 * Math.cos(u) * Math.sinh(v));
+
+          // 3D Rotation
+          const y1 = y0 * Math.cos(radX) - z0 * Math.sin(radX);
+          const z1 = y0 * Math.sin(radX) + z0 * Math.cos(radX);
+          const x2 = x0 * Math.cos(radY) + z1 * Math.sin(radY);
+          const z2 = -x0 * Math.sin(radY) + z1 * Math.cos(radY);
+
+          const projX = Math.floor(W / 2 + x2 * 1.6);
+          const projY = Math.floor(H / 2 + y1 * 0.8);
+
+          if (projX >= 0 && projX < W && projY >= 0 && projY < H) {
+            const idx = projX + projY * W;
+            if (z2 > zBuffer[idx]) {
+              zBuffer[idx] = z2;
+              const shadeIdx = Math.min(chars.length - 1, Math.max(0, Math.floor(((z2 + scale * 2) / (scale * 4)) * chars.length)));
+              b[idx] = chars[shadeIdx];
+            }
+          }
+        }
+      }
+
+      let resText = "";
+      for (let y = 0; y < H; y++) {
+        resText += b.slice(y * W, (y + 1) * W).join('') + "\n";
+      }
+      ascii.textContent = resText;
+      document.getElementById('rxVal').textContent = rx.value + '°';
+      document.getElementById('ryVal').textContent = ry.value + '°';
+      document.getElementById('resVal').textContent = `${N}x${N}`;
+      document.getElementById('scaleVal').textContent = pScale.value;
+    }
+
+    rx.oninput = renderCosta;
+    ry.oninput = renderCosta;
+    res.oninput = renderCosta;
+    pScale.oninput = renderCosta;
+    renderCosta();
+  
+</script>
+</head>
+<body>
+  <div class="container">
+    <h1>📐 3D Costa Minimal Surface ASCII / ANSI Studio</h1>
+    <div style="font-size: 0.85rem; color: #8b949e;">Complete client-side parametric evaluation of the Costa Minimal Surface genus-1 topology embedded in 3D projection space.</div>
+    
+    <div class="viewport">
+      <pre id="asciiOutput"></pre>
+    </div>
+
+    <div class="controls">
+      <div>
+        <label>Rotation Pitch (X): <span id="rxVal">0°</span></label>
+        <input type="range" id="rx" min="-180" max="180" value="30">
+      </div>
+      <div>
+        <label>Rotation Yaw (Y): <span id="ryVal">0°</span></label>
+        <input type="range" id="ry" min="-180" max="180" value="45">
+      </div>
+      <div>
+        <label>Mesh Resolution: <span id="resVal">32x32</span></label>
+        <input type="range" id="res" min="16" max="48" step="4" value="32">
+      </div>
+      <div>
+        <label>Surface Puncture Scale: <span id="scaleVal">1.2</span></label>
+        <input type="range" id="pScale" min="0.5" max="2.5" step="0.1" value="1.2">
+      </div>
+    </div>
+  </div>
+
+  
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Html Canvas Ascii 3D Costa Minimal Surface</h2>
+  
+  <p>Welcome to <strong>SA Labs Html Canvas Ascii 3D Costa Minimal Surface</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Html Canvas Ascii 3D Costa Minimal Surface, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Html Canvas Ascii 3D Costa Minimal Surface occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Html Canvas Ascii 3D Costa Minimal Surface is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

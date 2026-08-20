@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII 3D 클리퍼드 토러스 매듭 시뮬레이터 | Quanxs SA Labs</title>
+  <meta name="description" content="4차원 유클리드 공간 R4 상의 클리퍼드 토러스(Clifford Torus)를 3차원 및 2차원 ASCII 문자 행렬로 입체 사영하는 수학 그래픽 시뮬레이터">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ASCII 3D 클리퍼드 토러스 매듭 시뮬레이터",
+    "url": "https://salabs.quanxs.com/tools/html-canvas-ascii-3d-clifford-torus-knot.html",
+    "description": "4D 클리퍼드 토러스 매듭의 3D 입체 사영 및 실시간 ASCII 렌더링 엔진",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <style>
+    :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; }
+    body { margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); }
+    .container { max-width: 900px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 20px; }
+    h1 { margin: 0 0 8px 0; color: #fff; font-size: 1.8rem; }
+    .desc { color: #8b949e; font-size: 0.95rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .control-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.85rem; color: #8b949e; margin-bottom: 4px; font-weight: 600; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    pre { background: #090d13; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 11px; line-height: 11px; color: #58a6ff; overflow: hidden; text-align: center; height: 380px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: var(--accent); color: #0d1117; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #79b8ff; }
+  </style>
+<script>
+
+    const screen = document.getElementById('asciiScreen');
+    let running = true;
+    let angleXY = 0, angleZW = 0;
+    const W = 64, H = 34;
+    const chars = " .:-=+*#%@";
+
+    function render() {
+      if (!running) return;
+      const speed = parseFloat(document.getElementById('rotSpeed').value) / 1000;
+      const p = parseInt(document.getElementById('knotP').value);
+      const q = parseInt(document.getElementById('knotQ').value);
+      const d4 = parseFloat(document.getElementById('projDist').value) / 10;
+      
+      angleXY += speed * 1.5;
+      angleZW += speed * 2.1;
+
+      const buffer = Array(H).fill(null).map(() => Array(W).fill(' '));
+      const zBuffer = Array(H).fill(null).map(() => Array(W).fill(-999));
+
+      const steps = 300;
+      for (let i = 0; i < steps; i++) {
+        const u = (i / steps) * Math.PI * 2;
+        const x4 = Math.cos(p * u) / Math.SQRT2;
+        const y4 = Math.sin(p * u) / Math.SQRT2;
+        const z4 = Math.cos(q * u) / Math.SQRT2;
+        const w4 = Math.sin(q * u) / Math.SQRT2;
+
+        const cosA = Math.cos(angleXY), sinA = Math.sin(angleXY);
+        const rx = x4 * cosA - y4 * sinA;
+        const ry = x4 * sinA + y4 * cosA;
+
+        const cosB = Math.cos(angleZW), sinB = Math.sin(angleZW);
+        const rz = z4 * cosB - w4 * sinB;
+        const rw = z4 * sinB + w4 * cosB;
+
+        const factor = 1 / (d4 - rw);
+        const x3 = rx * factor;
+        const y3 = ry * factor;
+        const z3 = rz * factor;
+
+        const screenX = Math.floor(W / 2 + x3 * 28);
+        const screenY = Math.floor(H / 2 + y3 * 16);
+
+        if (screenX >= 0 && screenX < W && screenY >= 0 && screenY < H) {
+          if (z3 > zBuffer[screenY][screenX]) {
+            zBuffer[screenY][screenX] = z3;
+            const lumIndex = Math.min(chars.length - 1, Math.max(0, Math.floor((z3 + 1.2) * 3)));
+            buffer[screenY][screenX] = chars[lumIndex];
+          }
+        }
+      }
+
+      screen.innerText = buffer.map(row => row.join('')).join('\n');
+      requestAnimationFrame(render);
+    }
+
+    document.getElementById('toggleAnim').addEventListener('click', () => {
+      running = !running;
+      if (running) render();
+    });
+
+    ['rotSpeed', 'knotP', 'knotQ', 'projDist'].forEach(id => {
+      document.getElementById(id).addEventListener('input', (e) => {
+        if (id === 'rotSpeed') document.getElementById('speedVal').innerText = (e.target.value / 10).toFixed(1) + 'x';
+        if (id === 'knotP') document.getElementById('pVal').innerText = e.target.value;
+        if (id === 'knotQ') document.getElementById('qVal').innerText = e.target.value;
+        if (id === 'projDist') document.getElementById('distVal').innerText = (e.target.value / 10).toFixed(1);
+      });
+    });
+
+    render();
+  
+</script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>ASCII 3D 클리퍼드 토러스 매듭 렌더러</h1>
+      <div class="desc">4차원 유클리드 R⁴ 공간 클리퍼드 토러스 입체 사영 및 ASCII 텍스트 매트릭스 시각화</div>
+    </header>
+    <div class="card">
+      <div class="grid">
+        <div>
+          <div class="control-group">
+            <label>4D 회전 속도 (4D Rotation Speed): <span id="speedVal">1.0x</span></label>
+            <input type="range" id="rotSpeed" min="1" max="50" value="10">
+          </div>
+          <div class="control-group">
+            <label>매듭 매개변수 p (Knot winding p): <span id="pVal">3</span></label>
+            <input type="range" id="knotP" min="1" max="8" value="3">
+          </div>
+        </div>
+        <div>
+          <div class="control-group">
+            <label>매듭 매개변수 q (Knot winding q): <span id="qVal">2</span></label>
+            <input type="range" id="knotQ" min="1" max="8" value="2">
+          </div>
+          <div class="control-group">
+            <label>입체 사영 초점거리 (Stereographic Distance): <span id="distVal">2.5</span></label>
+            <input type="range" id="projDist" min="15" max="50" value="25">
+          </div>
+        </div>
+      </div>
+      <button id="toggleAnim">애니메이션 일시정지 (Pause / Resume)</button>
+      <pre id="asciiScreen"></pre>
+    </div>
+  </div>
+  
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Html Canvas Ascii 3D Clifford Torus Knot</h2>
+  
+  <p>Welcome to <strong>SA Labs Html Canvas Ascii 3D Clifford Torus Knot</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Html Canvas Ascii 3D Clifford Torus Knot, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Html Canvas Ascii 3D Clifford Torus Knot occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Html Canvas Ascii 3D Clifford Torus Knot is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

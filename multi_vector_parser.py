@@ -74,8 +74,7 @@ class MultiVectorCrossParsingAuditEngine:
     def parse_phase_4_skip_backward(self):
         """Phase 4: z -> x -> v Skip Backward Scan (Even Lines: Event Loop State Pollution)"""
         tokens = []
-        start_idx = self.total_lines - 1 if (self.total_lines - 1) % 2 == 1 else self.total_lines - 2
-        for idx in range(start_idx, -1, -2):
+        for idx in range(self.total_lines - 1, -1, -2):
             line = self.lines[idx]
             if 'addEventListener' in line or 'postMessage' in line or 'setTimeout' in line or 'setInterval' in line:
                 tokens.append({
@@ -86,6 +85,16 @@ class MultiVectorCrossParsingAuditEngine:
         return tokens
 
     def execute_vector_end_trajectory_linking(self):
+        try:
+            return self._execute_vector_end_trajectory_linking_impl()
+        except Exception as e:
+            return {
+                "target_file": self.filename,
+                "audit_integrity_score": 0,
+                "error_tensor": f"CRITICAL_PARSE_FAILURE: {str(e)}"
+            }
+
+    def _execute_vector_end_trajectory_linking_impl(self):
         """Vector End Stage: Trajectory Line Linking & Discontinuity Detection"""
         v1_forward = self.parse_phase_1_forward()
         v2_backward = self.parse_phase_2_backward()

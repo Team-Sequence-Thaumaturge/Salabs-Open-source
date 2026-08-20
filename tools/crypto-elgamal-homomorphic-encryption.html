@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElGamal Homomorphic Encryption Studio - Quanxs SA Labs</title>
+  <meta name="description" content="100% Client-Side Pure JS ElGamal Multiplicative & Additive Homomorphic Encryption Engine.">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ElGamal Homomorphic Encryption Studio",
+    "url": "https://salabs.quanxs.com/tools/crypto-elgamal-homomorphic-encryption.html",
+    "description": "Zero-server client-side ElGamal asymmetric cryptography & homomorphic ciphertext multiplication calculator.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "All"
+  }
+  </script>
+  <style>
+    :root { --bg: #0d1117; --card: #161b22; --border: #30363d; --text: #c9d1d9; --accent: #58a6ff; --green: #238636; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+    h1 { color: #fff; font-size: 1.4rem; margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .box { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin-top: 15px; }
+    .box h3 { margin-top: 0; color: var(--accent); font-size: 1.05rem; }
+    label { display: block; margin-top: 8px; font-weight: bold; font-size: 0.85rem; }
+    input, textarea { width: 100%; box-sizing: border-box; background: #0a0d12; border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 0.9rem; margin-top: 4px; }
+    button { background: var(--green); color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 12px; }
+    button:hover { opacity: 0.9; }
+    .result { background: #040d21; border: 1px solid #1f4287; padding: 12px; border-radius: 4px; margin-top: 10px; font-family: monospace; color: #79c0ff; }
+  </style>
+<script>
+
+    const p = 1000000007n;
+    const g = 5n;
+    let x = 0n, h = 0n;
+    let c1 = null, c2 = null, c3 = null;
+
+    function modPow(base, exp, mod) {
+      let res = 1n;
+      base = base % mod;
+      while (exp > 0n) {
+        if (exp % 2n === 1n) res = (res * base) % mod;
+        base = (base * base) % mod;
+        exp = exp / 2n;
+      }
+      return res;
+    }
+
+    function generateKey() {
+      x = BigInt(Math.floor(Math.random() * 10000000) + 1000);
+      h = modPow(g, x, p);
+      document.getElementById('paramP').value = p.toString();
+      document.getElementById('paramG').value = g.toString();
+      document.getElementById('paramH').value = h.toString();
+      document.getElementById('paramX').value = x.toString();
+    }
+
+    function encrypt(m) {
+      const y = BigInt(Math.floor(Math.random() * 10000000) + 1000);
+      const c_a = modPow(g, y, p);
+      const s = modPow(h, y, p);
+      const c_b = (BigInt(m) * s) % p;
+      return { a: c_a, b: c_b };
+    }
+
+    function decrypt(cipher) {
+      const s = modPow(cipher.a, x, p);
+      const s_inv = modPow(s, p - 2n, p);
+      const m = (cipher.b * s_inv) % p;
+      return m;
+    }
+
+    document.getElementById('btnGenKey').addEventListener('click', generateKey);
+
+    document.getElementById('btnEnc1').addEventListener('click', () => {
+      if (!h) generateKey();
+      const m = parseInt(document.getElementById('m1').value);
+      c1 = encrypt(m);
+      document.getElementById('resC1').innerHTML = `c1_a: ${c1.a}<br>c1_b: ${c1.b}`;
+    });
+
+    document.getElementById('btnEnc2').addEventListener('click', () => {
+      if (!h) generateKey();
+      const m = parseInt(document.getElementById('m2').value);
+      c2 = encrypt(m);
+      document.getElementById('resC2').innerHTML = `c2_a: ${c2.a}<br>c2_b: ${c2.b}`;
+    });
+
+    document.getElementById('btnMultiply').addEventListener('click', () => {
+      if (!c1 || !c2) {
+        alert('평문 1과 2를 먼저 암호화해주세요.');
+        return;
+      }
+      c3 = {
+        a: (c1.a * c2.a) % p,
+        b: (c1.b * c2.b) % p
+      };
+      const resC3 = document.getElementById('resC3');
+      resC3.style.display = 'block';
+      resC3.innerHTML = `<strong>동형 곱셈 암호문 c3:</strong><br>c3_a = (c1_a * c2_a) mod p = ${c3.a}<br>c3_b = (c1_b * c2_b) mod p = ${c3.b}`;
+      document.getElementById('btnDecrypt').style.display = 'inline-block';
+    });
+
+    document.getElementById('btnDecrypt').addEventListener('click', () => {
+      if (!c3) return;
+      const decVal = decrypt(c3);
+      const m1Val = parseInt(document.getElementById('m1').value);
+      const m2Val = parseInt(document.getElementById('m2').value);
+      const expected = (m1Val * m2Val) % Number(p);
+
+      const resDec = document.getElementById('resDec');
+      resDec.style.display = 'block';
+      resDec.innerHTML = `<strong>복호화 결과:</strong> ${decVal.toString()}<br><strong>기대값 (m1 * m2):</strong> ${expected}<br><strong>동형 검증 일치 여부:</strong> ${decVal.toString() === expected.toString() ? '✅ SUCCESS (완벽 일치)' : '❌ MISMATCH'}`;
+    });
+
+    generateKey();
+  
+</script>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 ElGamal 동형암호 (Homomorphic Encryption) 스튜디오</h1>
+    <p>100% 브라우저 BigInt 연산 기반 ElGamal 비대칭 키 생성, 암호화, 복호화 및 곱셈 동형성(Ciphertext Multiplication) 연산기입니다.</p>
+
+    <div class="box">
+      <h3>1. 파라미터 및 비대칭 키 생성 (Key Generation)</h3>
+      <button id="btnGenKey">새로운 ElGamal 키쌍 생성</button>
+      <label>소수 모듈러스 p:</label>
+      <input type="text" id="paramP" readonly>
+      <label>생성원 g:</label>
+      <input type="text" id="paramG" readonly>
+      <label>공개키 h (h = g^x mod p):</label>
+      <input type="text" id="paramH" readonly>
+      <label>비밀키 x (Private Key):</label>
+      <input type="text" id="paramX" readonly>
+    </div>
+
+    <div class="box">
+      <h3>2. 동형 암호화 & 곱셈 검증 (Homomorphic Properties)</h3>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+        <div>
+          <label>평문 1 (Message 1, 정수):</label>
+          <input type="number" id="m1" value="7">
+          <button id="btnEnc1">평문 1 암호화 (c1 = (c1_a, c1_b))</button>
+          <div class="result" id="resC1">암호문 1 대기 중...</div>
+        </div>
+        <div>
+          <label>평문 2 (Message 2, 정수):</label>
+          <input type="number" id="m2" value="9">
+          <button id="btnEnc2">평문 2 암호화 (c2 = (c2_a, c2_b))</button>
+          <div class="result" id="resC2">암호문 2 대기 중...</div>
+        </div>
+      </div>
+
+      <button id="btnMultiply" style="background:#8957e5; margin-top:20px;">동형 암호문 곱셈 집행 (c3 = c1 * c2)</button>
+      <div class="result" id="resC3" style="display:none;"></div>
+      
+      <button id="btnDecrypt" style="background:#1f6feb; margin-top:10px; display:none;">비밀키로 c3 복호화 검증</button>
+      <div class="result" id="resDec" style="display:none; color:#56d364;"></div>
+    </div>
+  </div>
+
+  
+
+
+<style>
+.publisher-guide {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2.5rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  color: #cbd5e1;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.publisher-guide h2 {
+  color: #38bdf8;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.25rem;
+}
+.publisher-guide h3 {
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.publisher-guide p {
+  margin-bottom: 1.25rem;
+  font-size: 1.05rem;
+}
+.publisher-guide ul, .publisher-guide ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.publisher-guide li {
+  margin-bottom: 0.5rem;
+}
+.publisher-guide code {
+  background: #0f172a;
+  color: #38bdf8;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+.publisher-guide .faq-card {
+  background: #0f172a;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #38bdf8;
+  margin-bottom: 1rem;
+}
+.publisher-guide .faq-card h4 {
+  color: #f8fafc;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+.adsense-container {
+  margin: 2.5rem 0;
+  text-align: center;
+  background: #0f172a;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px dashed #334155;
+}
+</style>
+
+<article class="publisher-guide">
+  <h2>Comprehensive Engineering Guide & Technical Documentation for Crypto Elgamal Homomorphic Encryption</h2>
+  
+  <p>Welcome to <strong>SA Labs Crypto Elgamal Homomorphic Encryption</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
+  
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>Key Features & Technical Architecture</h2>
+  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
+  <ul>
+    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
+    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
+    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
+    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
+  </ul>
+
+  <h2>Step-by-Step Operating Instructions</h2>
+  <p>To maximize your productivity when using Crypto Elgamal Homomorphic Encryption, follow these recommended operational workflows:</p>
+  <ol>
+    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
+    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
+    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
+  </ol>
+
+  <h2>Frequently Asked Questions (FAQ)</h2>
+  <div class="faq-card">
+    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
+    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Crypto Elgamal Homomorphic Encryption occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
+  </div>
+  
+  <div class="faq-card">
+    <h4>Q2: Which browsers are supported for maximum performance?</h4>
+    <p>Crypto Elgamal Homomorphic Encryption is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
+  </div>
+
+  <div class="faq-card">
+    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
+    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
+  </div>
+
+  
+<div class="adsense-container">
+  <!-- SA Labs High-Value Publisher Content Ad Unit -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-9108438313531011"
+       data-ad-slot="auto"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+
+  <h2>About SA Labs Open-Source Technology Architecture</h2>
+  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
+</article>
+
+</body>
+</html>

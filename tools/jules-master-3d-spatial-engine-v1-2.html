@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jules Master 3D Spatial Engine - All 12 Modules Synthesized</title>
+    <title>Jules Master 3D Spatial Engine - All 11 Modules Synthesized</title>
 
     <!-- Schema.org WebApplication JSON-LD metadata -->
     <script type="application/ld+json">
@@ -36,6 +36,18 @@
 
     <!-- Three.js Global CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module">
+      import { ARButton } from "three/addons/webxr/ARButton.js";
+      window.ARButton = ARButton;
+    </script>
     <script>
       // Inline Standalone OrbitControls Fallback
       if (typeof THREE !== "undefined" && !THREE.OrbitControls) {
@@ -51,12 +63,6 @@
       }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
     <style>
       body {
@@ -192,8 +198,7 @@
         font-size: 0.7rem;
       }
     </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9108438313531011" crossorigin="anonymous"></script>
-</head>
+  </head>
   <body>
     <canvas id="webgl-canvas"></canvas>
 
@@ -203,8 +208,8 @@
         <h1
           class="text-xl font-bold text-cyan-accent mb-1 flex items-center justify-between"
         >
-          Jules Master 3D Engine v2
-          <span class="badge-synthesized">12 Modules Bound</span>
+          Jules Master 3D Engine
+          <span class="badge-synthesized">11 Modules Bound</span>
         </h1>
         <p class="text-xs text-slate-400 mb-4">
           Unified Dynamic State Bus Interlock
@@ -215,6 +220,22 @@
           <div class="slider-label">
             <span>Gravity Acceleration (중력 수치)</span>
             <span id="gravity-val">9.81 m/s²</span>
+
+            <div class="mt-4 pt-3 border-t border-slate-700">
+              <div class="text-xs font-semibold text-slate-400 mb-2 tracking-wider">TOPOLOGICAL COGNITION TENSORS</div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-300 text-[11px]">Curvature ∇Φ</span>
+                <span id="cog-curvature" class="font-mono text-cyan-400 text-xs font-bold">0.000</span>
+              </div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-300 text-[11px]">Density ρ</span>
+                <span id="cog-density" class="font-mono text-blue-400 text-xs font-bold">0.000</span>
+              </div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-300 text-[11px]">Distortion J</span>
+                <span id="cog-distortion" class="font-mono text-purple-400 text-xs font-bold">0.000</span>
+              </div>
+            </div>
           </div>
           <input
             type="range"
@@ -259,7 +280,7 @@
         </div>
 
         <!-- Slider 4: Audio Spectrum FFT Frequency Pulse -->
-                <div class="slider-container">
+        <div class="slider-container">
           <div class="slider-label">
             <span>Audio Spectrum FFT Pulse</span>
             <span id="audio-val">440 Hz</span>
@@ -271,87 +292,6 @@
             max="1000"
             step="10"
             value="440"
-          />
-        </div>
-
-        <div class="slider-container">
-          <div class="slider-label">
-            <span>Cinematic Bloom Strength</span>
-            <span id="bloom-val">1.5</span>
-          </div>
-          <input
-            type="range"
-            id="bloom-slider"
-            min="0.0"
-            max="3.0"
-            step="0.1"
-            value="1.5"
-          />
-        </div>
-
-
-        <!-- Slider 6: Turbulence Strength -->
-        <div class="slider-container">
-          <div class="slider-label">
-            <span>Turbulence Strength</span>
-            <span id="turb-val">1.0</span>
-          </div>
-          <input
-            type="range"
-            id="turb-slider"
-            min="0.0"
-            max="3.0"
-            step="0.1"
-            value="1.0"
-          />
-        </div>
-
-        <!-- Slider 7: Vortex Speed -->
-        <div class="slider-container">
-          <div class="slider-label">
-            <span>Vortex Speed</span>
-            <span id="vortex-val">1.0</span>
-          </div>
-          <input
-            type="range"
-            id="vortex-slider"
-            min="0.0"
-            max="5.0"
-            step="0.1"
-            value="1.0"
-          />
-        </div>
-
-
-        <!-- Slider 8: Active Rigid Bodies -->
-        <div class="slider-container">
-          <div class="slider-label">
-            <span>Active Rigid Bodies</span>
-            <span id="bodies-val">50</span>
-          </div>
-          <input
-            type="range"
-            id="bodies-slider"
-            min="10"
-            max="100"
-            step="1"
-            value="50"
-          />
-        </div>
-
-        <!-- Slider 9: Restitution (Elasticity) -->
-        <div class="slider-container">
-          <div class="slider-label">
-            <span>Restitution (Elasticity)</span>
-            <span id="restitution-val">0.8</span>
-          </div>
-          <input
-            type="range"
-            id="restitution-slider"
-            min="0.1"
-            max="1.5"
-            step="0.05"
-            value="0.8"
           />
         </div>
 
@@ -390,7 +330,7 @@
 
         <div class="mt-4 pt-3 border-t border-slate-700">
           <div class="text-xs font-semibold text-cyan-accent mb-2">
-            Synthesized 12 Subsystem Modules:
+            Synthesized 11 Subsystem Modules:
           </div>
           <ul class="text-xs text-slate-300 space-y-1">
             <li class="flex justify-between">
@@ -437,10 +377,6 @@
               <span>11. WebXR AR Overlays & ARButton</span
               ><span class="text-emerald-400">ONLINE</span>
             </li>
-            <li class="flex justify-between">
-              <span class="text-yellow-300">12. Topological Cognition Core</span
-              ><span class="text-emerald-400">ONLINE</span>
-            </li>
           </ul>
         </div>
       </div>
@@ -456,19 +392,114 @@
 
     <script>
       // --- 1. Global Engine Dynamic State Bus ---
-                        const GlobalState = {
+      
+      window.riemannWasm = null;
+      window.riemannWasmMemory = null;
+      fetch('../polyglot_3d_engine/src/stella_riemann_wasm.wasm')
+        .then(response => response.arrayBuffer())
+        .then(bytes => WebAssembly.instantiate(bytes, {}))
+        .then(results => {
+          window.riemannWasm = results.instance.exports;
+          window.riemannWasmMemory = results.instance.exports.memory;
+          console.log("Rust WASM loaded successfully.");
+        })
+        .catch(console.error);
+
+      // --- Module 12: Topological Cognition Core (Native Chaos Tensor Engine) ---
+      class TopologicalCognitionCore {
+        constructor() {
+          this.curvature = 0.0;
+          this.density = 0.0;
+          this.distortion = 0.0;
+          // Lorenz Attractor for Autonomous Chaos Math
+          this.sigma = 10.0;
+          this.rho = 28.0;
+          this.beta = 8.0 / 3.0;
+          this.x = 0.1;
+          this.y = 0.0;
+          this.z = 0.0;
+
+          // Stella Core Phase 6.6 Wave Dynamics
+          this.stellaWave = 0.0;
+          this.entropy = 1.0;
+          this.time_acc = 0.0;
+        }
+        update(dt) {
+          this.time_acc += dt;
+          // Calculate Lorenz Attractor differentials
+          const dx = (this.sigma * (this.y - this.x)) * dt;
+          const dy = (this.x * (this.rho - this.z) - this.y) * dt;
+          const dz = (this.x * this.y - this.beta * this.z) * dt;
+          
+          this.x += dx * 0.5; // Scaled down for smoothness
+          this.y += dy * 0.5;
+          this.z += dz * 0.5;
+
+          // Map Lorenz space to Tensor parameters
+          this.curvature = (this.z / 30.0) * 1.5; // Deep gravity wells
+          this.density = Math.abs(this.x / 15.0); // Concentration of knowledge
+          this.distortion = (this.y / 20.0);      // Topological dissonance
+
+          // Stella Core 262-dim Riemannian Manifold Wave Proxy
+          const n = 262; // 262-dimensional manifold
+
+          let waveSum = 0.0;
+
+          // Triple-Fusion Integration: Rust WASM Tensor Engine via C-FFI
+          if (window.riemannWasm && window.riemannWasmMemory) {
+            // Allocate memory using Rust's allocator
+            const ptr = window.riemannWasm.alloc(n);
+            const f32Array = new Float32Array(window.riemannWasmMemory.buffer, ptr, n);
+
+            // Populate tensor representations (simulate dynamic embeddings)
+            for(let i = 0; i < n; i++) {
+              f32Array[i] = Math.sin(this.time_acc * (i + 1) * 0.05) * this.distortion;
+            }
+
+            // Execute AVX-512 Zero-Latency C-FFI calculations
+            const wasmCurvature = window.riemannWasm.calculate_riemann_curvature(ptr, n);
+            const wasmResonance = window.riemannWasm.calculate_digital_wave_resonance(ptr, n, this.time_acc);
+
+            // Free the memory
+            window.riemannWasm.dealloc(ptr, n);
+
+            // Integrate Native Engine results back to Pure JS Math
+            waveSum = wasmResonance * 0.01;
+            this.curvature += wasmCurvature * 0.05;
+          } else {
+            // Pure JS Fallback Math
+            for(let i = 1; i <= 7; i++) {
+               waveSum += Math.sin(this.time_acc * i * 0.5) * (1.0 / i);
+            }
+          }
+          this.stellaWave = waveSum;
+
+          // Apply M(H) = e^H * (ln(n) - H) representation complexity equation
+          // Let H be simulated by dynamic entropy (driven by distortion)
+          this.entropy = 1.0 + Math.abs(Math.sin(this.time_acc * 0.2)) * this.distortion * 0.5;
+          const ln_n = Math.log(n);
+
+          // Defensive clamp for entropy H to not exceed ln_n
+          const H = Math.min(this.entropy, ln_n - 0.01);
+          const M = Math.exp(H) * (ln_n - H);
+          const M_max = n / Math.E;
+
+          // Normalize M and apply to density/curvature as a unified field equation
+          const efficiency = M / M_max;
+
+          // Inject wave and efficiency back into the tensors
+          this.curvature += this.stellaWave * 0.2 * efficiency;
+          this.density = this.density * Math.max(0.1, efficiency) + Math.abs(this.stellaWave) * 0.1;
+          this.distortion *= Math.max(0.1, 2.0 - efficiency); // High efficiency reduces chaotic distortion
+        }
+      }
+      const CognitionCore = new TopologicalCognitionCore();
+      
+      const GlobalState = {
         gravity: 9.81,
         solarAngle: 12.0,
-        topologyDistance: 6.0,
+        vectorDensity: 6.0,
         audioFrequency: 440,
-        bloomStrength: 1.5,
-        turbulence: 1.0,
-        vortexSpeed: 1.0,
-        activeRigidBodies: 50,
-        restitution: 0.8,
-        totalKineticEnergy: 0,
-        currentAmp: 0.0,
-        isMicActive: false
       };
 
       // --- 2. AST JSON Tree Inspector Engine ---
@@ -544,7 +575,7 @@
         container.innerHTML = "";
         const displayState = {
           engine_status: "SYNTHESIZED_ONLINE",
-          version: "2.0.0-ALL-12-MODULES-BOUND",
+          version: "2.0.0-ALL-11-MODULES-BOUND",
           dynamic_state: GlobalState,
           active_modules: [
             "C++ Physics",
@@ -553,7 +584,6 @@
             "Audio FFT",
             "Thermal Expansion",
             "AST Tree",
-            "Topological Cognition Core",
           ],
         };
         const rootUl = document.createElement("ul");
@@ -572,414 +602,16 @@
       }
       const physics = new PhysicsCore();
 
-      // --- Module 12: Topological Cognition Core ---
-      class TopologicalCognitionCore {
-        constructor() {
-          this.curvature = 0;
-          this.density = 0;
-          this.distortion = 0;
-        }
-
-        update(state, time) {
-          // Dynamic calculation based on GlobalState and time
-          this.density = state.topologyDistance;
-          this.distortion = Math.sin(time) * 0.5 + Math.cos(time * 0.3) * 0.5 + (state.audioFrequency / 1000) * 2;
-          this.curvature = (state.gravity / 9.81) * (1 + Math.sin(time * 0.5) * 0.2);
-        }
-
-        getDepthAt(x, z) {
-           // Deep Gravity Wells (Y-axis sink)
-           const distance = Math.sqrt(x*x + z*z);
-           // Calculate depth based on curvature and distance from origin (or other patterns)
-           const wellDepth = -Math.max(0, (5 - distance) * this.curvature * 0.3);
-           // Add some noise
-           const noise = Math.sin(x * this.distortion) * Math.cos(z * this.distortion) * 0.5;
-           return wellDepth + noise;
-        }
-      }
-      const topoCore = new TopologicalCognitionCore();
-
       // --- 4. Three.js Unified Interlocked Scene ---
-      let scene, camera, renderer, composer, bloomPass, controls, mainLight, canvas;
-
-      // --- Phase 3: Raycasting Setup ---
-      const raycaster = new THREE.Raycaster();
-      const mouse = new THREE.Vector2();
-      const uMousePos = new THREE.Vector3(0, 0, 0);
-      const intersectionPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-
-      window.addEventListener('mousemove', (event) => {
-        // Calculate mouse position in normalized device coordinates (-1 to +1)
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      });
-      let bouncingSphere, // Deprecated single body variable, kept for backward compat safety if needed
-                        quantumParticles,
+      let scene, camera, renderer, controls, mainLight, canvas;
+      let bouncingSphere,
+        quantumParticles,
         topologyNodes = [],
         topologyLinesGroup,
         audioMesh;
       let lastTime = Date.now();
 
-
-
-      // ============================================================================
-      // PHASE 5: HEADLESS SPATIAL ENGINE CORE & ECS ARCHITECTURE
-      // ============================================================================
-
-      // --- Event Bus (Observer Pattern) for Decoupling ---
-      class EventBus {
-          constructor() {
-              this.listeners = {};
-          }
-          on(event, callback) {
-              if (!this.listeners[event]) this.listeners[event] = [];
-              this.listeners[event].push(callback);
-          }
-          emit(event, data) {
-              if (this.listeners[event]) {
-                  this.listeners[event].forEach(cb => cb(data));
-              }
-          }
-      }
-      const engineBus = new EventBus();
-
-      // --- ECS: Components ---
-      class TransformComponent {
-          constructor(mesh) { this.mesh = mesh; }
-      }
-      class RigidBodyComponent {
-          constructor(mass, radius, velocity, angularVelocity) {
-              this.mass = mass;
-              this.radius = radius;
-              this.velocity = velocity;
-              this.angularVelocity = angularVelocity;
-          }
-      }
-
-      // --- ECS: EntityManager ---
-      class EntityManager {
-          constructor() {
-              this.entities = new Map();
-              this.nextId = 1;
-          }
-          createEntity() {
-              const id = this.nextId++;
-              this.entities.set(id, {});
-              return id;
-          }
-          addComponent(entityId, componentName, componentData) {
-              const entity = this.entities.get(entityId);
-              if (entity) entity[componentName] = componentData;
-          }
-          getComponent(entityId, componentName) {
-              return this.entities.get(entityId)?.[componentName];
-          }
-          removeEntity(entityId) {
-              this.entities.delete(entityId);
-          }
-          getEntitiesWith(components) {
-              const result = [];
-              for (const [id, entity] of this.entities.entries()) {
-                  if (components.every(c => entity[c] !== undefined)) {
-                      result.push(id);
-                  }
-              }
-              return result;
-          }
-          clear() {
-              this.entities.clear();
-              this.nextId = 1;
-          }
-      }
-
-      // --- ECS: Systems ---
-      class PhysicsSystem {
-          constructor(entityManager, topoCore) {
-              this.em = entityManager;
-              this.topoCore = topoCore;
-              this.gridCellSize = 5.0;
-              this.spatialGrid = new Map();
-          }
-          getGridKey(pos) {
-              return `${Math.floor(pos.x / this.gridCellSize)},${Math.floor(pos.y / this.gridCellSize)},${Math.floor(pos.z / this.gridCellSize)}`;
-          }
-          update(dt, globalState) {
-              this.spatialGrid.clear();
-              let totalKE = 0;
-              const entities = this.em.getEntitiesWith(['TransformComponent', 'RigidBodyComponent']);
-
-              const thermalScale = physics.applyThermalExpansion(globalState.solarAngle, 1.0);
-              const pulseBoost = globalState.isMicActive ? globalState.currentAmp * 1.5 : ((globalState.audioFrequency - 100) / 900) * 0.5;
-              const finalScale = thermalScale + pulseBoost;
-
-              // Step 1: Update positions & build spatial hash grid
-              for (const id of entities) {
-                  const transform = this.em.getComponent(id, 'TransformComponent');
-                  const rb = this.em.getComponent(id, 'RigidBodyComponent');
-                  const mesh = transform.mesh;
-
-                  // Gravity
-                  rb.velocity.y -= globalState.gravity * dt;
-
-                  // Integrate
-                  mesh.position.addScaledVector(rb.velocity, dt);
-                  mesh.rotation.x += rb.angularVelocity.x * dt;
-                  mesh.rotation.y += rb.angularVelocity.y * dt;
-                  mesh.rotation.z += rb.angularVelocity.z * dt;
-                  mesh.scale.set(finalScale, finalScale, finalScale);
-
-                  const currentRadius = rb.radius * finalScale;
-
-                  // Topo core interactions
-                  let floorY = window.floorMesh ? window.floorMesh.position.y : -2.5;
-                  if (this.topoCore) {
-                      const sinkDepth = this.topoCore.getDepthAt(mesh.position.x, mesh.position.z);
-                      floorY += sinkDepth;
-
-                      const gradX = -mesh.position.x * 0.05 * this.topoCore.curvature;
-                      const gradZ = -mesh.position.z * 0.05 * this.topoCore.curvature;
-                      rb.velocity.x += gradX * dt;
-                      rb.velocity.z += gradZ * dt;
-                  }
-
-                  // Floor collision
-                  if (mesh.position.y - currentRadius <= floorY) {
-                      mesh.position.y = floorY + currentRadius;
-                      rb.velocity.y = Math.abs(rb.velocity.y) * globalState.restitution;
-                      rb.velocity.x *= 0.98;
-                      rb.velocity.z *= 0.98;
-                  }
-
-                  // KE
-                  totalKE += 0.5 * rb.mass * rb.velocity.lengthSq();
-
-                  // Grid assignment
-                  const key = this.getGridKey(mesh.position);
-                  if(!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
-                  this.spatialGrid.get(key).push({id, mesh, rb, currentRadius});
-              }
-
-              // Step 2: Broad-phase & narrow-phase collision
-              const cells = Array.from(this.spatialGrid.keys());
-              for (let key of cells) {
-                  const [cx, cy, cz] = key.split(',').map(Number);
-                  let bodiesToCheck = [];
-                  for(let x=-1; x<=1; x++) {
-                      for(let y=-1; y<=1; y++) {
-                          for(let z=-1; z<=1; z++) {
-                              const neighborKey = `${cx+x},${cy+y},${cz+z}`;
-                              if(this.spatialGrid.has(neighborKey)) {
-                                  bodiesToCheck = bodiesToCheck.concat(this.spatialGrid.get(neighborKey));
-                              }
-                          }
-                      }
-                  }
-
-                  const checkedPairs = new Set();
-
-                  for(let i=0; i<bodiesToCheck.length; i++) {
-                      for(let j=i+1; j<bodiesToCheck.length; j++) {
-                          const b1 = bodiesToCheck[i];
-                          const b2 = bodiesToCheck[j];
-                          if(b1.id === b2.id) continue;
-
-                          const pairId = b1.id < b2.id ? `${b1.id}-${b2.id}` : `${b2.id}-${b1.id}`;
-                          if(checkedPairs.has(pairId)) continue;
-                          checkedPairs.add(pairId);
-
-                          const p1 = b1.mesh.position;
-                          const p2 = b2.mesh.position;
-                          const distSq = p1.distanceToSquared(p2);
-                          const rSum = b1.currentRadius + b2.currentRadius;
-
-                          if(distSq < rSum * rSum) {
-                              const dist = Math.sqrt(distSq);
-                              const normal = new THREE.Vector3().subVectors(p1, p2).normalize();
-                              const overlap = rSum - dist;
-                              const correction = normal.clone().multiplyScalar(overlap * 0.5);
-
-                              p1.add(correction);
-                              p2.sub(correction);
-
-                              const relVel = new THREE.Vector3().subVectors(b1.rb.velocity, b2.rb.velocity);
-                              const velAlongNormal = relVel.dot(normal);
-                              if(velAlongNormal > 0) continue;
-
-                              const e = globalState.restitution;
-                              const jImpulse = -(1 + e) * velAlongNormal / (1/b1.rb.mass + 1/b2.rb.mass);
-                              const impulse = normal.multiplyScalar(jImpulse);
-
-                              b1.rb.velocity.add(impulse.clone().multiplyScalar(1/b1.rb.mass));
-                              b2.rb.velocity.sub(impulse.clone().multiplyScalar(1/b2.rb.mass));
-                          }
-                      }
-                  }
-              }
-
-              globalState.totalKineticEnergy = parseFloat(totalKE.toFixed(2));
-          }
-      }
-
-      class ParticleDynamicSystem {
-          update(globalState, pulseBoost) {
-              if (quantumParticles) {
-                  const particlePulse = 1.0 + pulseBoost * 0.8;
-                  quantumParticles.scale.set(particlePulse, particlePulse, particlePulse);
-
-                  const time = globalState.time;
-                  quantumParticles.rotation.y = time * 0.2 * (globalState.audioFrequency / 440) * (9.81 / Math.max(globalState.gravity, 0.1));
-                  quantumParticles.scale.setScalar(1.0 + (globalState.gravity - 9.81) * 0.05);
-                  if (quantumParticles.material) {
-                      quantumParticles.material.uniforms.color1.value.setHSL(
-                          (globalState.solarAngle / 24.0 + 0.5) % 1.0, 1.0, 0.5
-                      );
-                  }
-              }
-          }
-      }
-
-      class IKTrackingSystem {
-          constructor(entityManager) {
-              this.em = entityManager;
-          }
-          update() {
-              if (window.ikArm && window.armBone && window.forearmBone) {
-                  let nearestBodyPos = new THREE.Vector3(0, 10, 0);
-                  let minDist = Infinity;
-
-                  const entities = this.em.getEntitiesWith(['TransformComponent']);
-                  if(entities.length > 0) {
-                      for(const id of entities) {
-                          const transform = this.em.getComponent(id, 'TransformComponent');
-                          const d = window.ikArm.position.distanceToSquared(transform.mesh.position);
-                          if(d < minDist) {
-                              minDist = d;
-                              nearestBodyPos.copy(transform.mesh.position);
-                          }
-                      }
-                  }
-
-                  const targetPos = nearestBodyPos.clone().sub(window.ikArm.position);
-                  const l1 = 2;
-                  const l2 = 2;
-                  const x = targetPos.x;
-                  const y = targetPos.y;
-                  const z = targetPos.z;
-
-                  const r = Math.sqrt(x * x + z * z);
-                  const d = Math.sqrt(r * r + y * y);
-                  let theta1 = Math.atan2(z, x);
-                  let theta2 = 0;
-                  let theta3 = 0;
-
-                  if (d <= l1 + l2) {
-                    const cosTheta3 = (d * d - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-                    theta3 = Math.acos(Math.max(-1, Math.min(1, cosTheta3)));
-                    const alpha = Math.atan2(y, r);
-                    const beta = Math.acos(
-                      Math.max(
-                        -1,
-                        Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d)),
-                      ),
-                    );
-                    theta2 = alpha + beta;
-                  }
-
-                  window.ikArm.rotation.y = -theta1;
-                  window.armBone.rotation.z = Math.PI / 2 - theta2;
-                  window.forearmBone.rotation.z = -theta3;
-              }
-          }
-      }
-
-      // --- ECS: Headless Core ---
-      class SpatialEngineCore {
-          constructor(topoCore) {
-              this.em = new EntityManager();
-              this.topoCore = topoCore;
-              this.systems = [];
-              this.modules = {}; // Plugin dispatcher
-
-              // Initialize Systems
-              this.systems.push(new PhysicsSystem(this.em, this.topoCore));
-              this.systems.push(new ParticleDynamicSystem());
-              this.systems.push(new IKTrackingSystem(this.em));
-
-              // Register Events
-              engineBus.on("UPDATE_PHYSICS_POOL", (count) => this.rebuildPhysicsPool(count));
-          }
-
-          registerModule(name, moduleInstance) {
-              this.modules[name] = moduleInstance;
-              console.log(`Module registered: ${name}`);
-          }
-
-          rebuildPhysicsPool(targetCount) {
-              // Destroy existing rigid bodies
-              const currentBodies = this.em.getEntitiesWith(['TransformComponent', 'RigidBodyComponent']);
-              for(const id of currentBodies) {
-                  const transform = this.em.getComponent(id, 'TransformComponent');
-                  if (scene) scene.remove(transform.mesh);
-                  this.em.removeEntity(id);
-              }
-
-              const sphereGeo = new THREE.SphereGeometry(1, 16, 16);
-              const boxGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-
-              for (let i = 0; i < targetCount; i++) {
-                  const isBox = Math.random() > 0.5;
-                  const geo = isBox ? boxGeo : sphereGeo;
-                  const color = new THREE.Color().setHSL(Math.random(), 1.0, 0.5);
-                  const mat = new THREE.MeshPhongMaterial({ color: color, wireframe: true, wireframeLinewidth: 2 });
-                  const mesh = new THREE.Mesh(geo, mat);
-
-                  mesh.castShadow = true;
-                  mesh.receiveShadow = true;
-
-                  const radius = isBox ? 0.75 : 1.0;
-                  const mass = Math.random() * 2.0 + 0.5;
-
-                  mesh.position.set(
-                      (Math.random() - 0.5) * 40,
-                      10 + Math.random() * 20,
-                      (Math.random() - 0.5) * 40
-                  );
-
-                  if (scene) scene.add(mesh);
-
-                  const entityId = this.em.createEntity();
-                  this.em.addComponent(entityId, 'TransformComponent', new TransformComponent(mesh));
-                  this.em.addComponent(entityId, 'RigidBodyComponent', new RigidBodyComponent(
-                      mass, radius,
-                      new THREE.Vector3((Math.random()-0.5)*5, 0, (Math.random()-0.5)*5),
-                      new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5)
-                  ));
-              }
-          }
-
-          tick(dt, globalState) {
-              // Update registered subsystems
-              if(this.topoCore) this.topoCore.update(globalState, globalState.time);
-
-              const pulseBoost = globalState.isMicActive ? globalState.currentAmp * 1.5 : ((globalState.audioFrequency - 100) / 900) * 0.5;
-
-              for (const system of this.systems) {
-                  if (system instanceof PhysicsSystem) system.update(dt, globalState);
-                  else if (system instanceof ParticleDynamicSystem) system.update(globalState, pulseBoost);
-                  else if (system instanceof IKTrackingSystem) system.update();
-              }
-          }
-      }
-
-      // Initialize the Headless Engine Core
-      const engineCore = new SpatialEngineCore(topoCore);
-
-      // Register Subsystem Modules dynamically via Dispatcher
-      engineCore.registerModule("PhysicsCore", physics);
-      engineCore.registerModule("TopologicalCognitionCore", topoCore);
-      engineCore.registerModule("EventBus", engineBus);
-
-function init() {
+      function init() {
         canvas = document.getElementById("webgl-canvas");
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0f172a);
@@ -1001,28 +633,18 @@ function init() {
           300,
           window.innerHeight || canvas.clientHeight || 600,
         );
-                renderer.setSize(initW, initH);
+        renderer.setSize(initW, initH);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.xr.enabled = true;
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.toneMapping = THREE.ReinhardToneMapping;
 
-        // Post-Processing EffectComposer
-        const renderScene = new THREE.RenderPass(scene, camera);
-        bloomPass = new THREE.UnrealBloomPass(
-            new THREE.Vector2(initW, initH),
-            1.5, // strength
-            0.4, // radius
-            0.1  // threshold
-        );
-        composer = new THREE.EffectComposer(renderer);
-        composer.addPass(renderScene);
-        composer.addPass(bloomPass);
-        // --- Multi-Rigid Body Subsystem Initial Pool ---
-        engineBus.emit("UPDATE_PHYSICS_POOL", GlobalState.activeRigidBodies);
-
-        // ARButton optional
+        // Module 11: WebXR AR Overlays & ARButton
+        setTimeout(() => {
+          if (window.ARButton) {
+            document.body.appendChild(window.ARButton.createButton(renderer));
+          }
+        }, 100);
 
         const OrbitCtrlClass =
           typeof THREE.OrbitControls === "function"
@@ -1055,88 +677,116 @@ function init() {
         scene.add(mainLight);
         scene.add(new THREE.AmbientLight(0x1e293b, 1.5));
 
-        // Advanced Displacement Shader Material for the Grid/Floor
-        const gridUniforms = {
-            time: { value: 0 },
-            curvature: { value: 0 },
-            distortion: { value: 0 },
-            color1: { value: new THREE.Color(0x00f2fe) },
-            color2: { value: new THREE.Color(0x1e293b) }
-        };
+        // Module 7: Quantum Relativity Curvature Grid
+        const gridGeo = new THREE.PlaneGeometry(30, 30, 64, 64);
+        gridGeo.rotateX(-Math.PI / 2);
 
-        const gridVertShader = `
-            varying vec2 vUv;
-            varying vec3 vPos;
+        window.quantumGridMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            time: { value: 0.0 },
+            gravity: { value: GlobalState.gravity },
+            solarAngle: { value: GlobalState.solarAngle },
+            cogCurvature: { value: 0.0 },
+            cogDensity: { value: 0.0 },
+            cogDistortion: { value: 0.0 }
+          },
+          vertexShader: `
             uniform float time;
-            uniform float curvature;
-            uniform float distortion;
+            uniform float gravity;
+            uniform float solarAngle;
+            uniform float cogCurvature;
+            uniform float cogDensity;
+            uniform float cogDistortion;
+            varying vec2 vUv;
+            
+            // Simplex noise function for topological distortion
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+            float snoise(vec2 v) {
+              const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+              vec2 i  = floor(v + dot(v, C.yy) );
+              vec2 x0 = v -   i + dot(i, C.xx);
+              vec2 i1; i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+              vec4 x12 = x0.xyxy + C.xxzz;
+              x12.xy -= i1;
+              i = mod289(i);
+              vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+              vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+              m = m*m ; m = m*m ;
+              vec3 x = 2.0 * fract(p * C.www) - 1.0;
+              vec3 h = abs(x) - 0.5;
+              vec3 ox = floor(x + 0.5);
+              vec3 a0 = x - ox;
+              m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+              vec3 g;
+              g.x  = a0.x  * x0.x  + h.x  * x0.y;
+              g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+              return 130.0 * dot(m, g);
+            }
 
             void main() {
-                vUv = uv;
-                vPos = position;
+              vUv = uv;
+              vec3 pos = position;
+              
+              float dist = length(pos.xz);
+              
+              // 1. Density Contraction (Pulls grid towards center)
+              pos.xz *= 1.0 - (cogDensity * 0.2 * exp(-dist * 0.1));
+              
+              // 2. Curvature (Deep Riemannian Gravity Wells)
+              float curveDepth = (gravity - 9.81) * 0.05 + cogCurvature;
+              pos.y -= curveDepth * exp(-dist * 0.2) * 5.0; // Gravity well shape
+              
+              // 3. Distortion (Topological noise / dissonance)
+              float noise = snoise(pos.xz * 0.2 + time) * cogDistortion;
+              pos.y += noise * 2.0;
 
-                // Add topological displacement based on curvature and distortion
-                // Calculate distance from center
-                float dist = length(position.xy); // XY because plane is rotated
+              // Solar thermal wave
+              float solarRad = (solarAngle / 24.0) * 3.14159 * 2.0;
+              pos.y += cos(pos.x * 0.5 + time + solarRad) * 0.2;
 
-                // Sink into gravity well
-                float depth = -curvature * exp(-dist * dist * 0.05);
-
-                // Add noise/distortion
-                float noise = sin(position.x * 2.0 + time) * cos(position.y * 2.0 + time) * distortion * 0.5;
-
-                vec3 newPos = position;
-                newPos.z += depth + noise; // Z acts as Y after rotation
-
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
             }
-        `;
-
-        const gridFragShader = `
-            varying vec2 vUv;
-            varying vec3 vPos;
-            uniform vec3 color1;
-            uniform vec3 color2;
+          `,
+          fragmentShader: `
             uniform float time;
-
+            uniform float cogDistortion;
+            varying vec2 vUv;
             void main() {
-                // Grid pattern
-                vec2 grid = abs(fract(vUv * 30.0 - 0.5) - 0.5) / fwidth(vUv * 30.0);
-                float line = min(grid.x, grid.y);
-                float alpha = 1.0 - min(line, 1.0);
+              vec2 grid = abs(fract(vUv * 30.0 - 0.5) - 0.5) / fwidth(vUv * 30.0);
+              float line = min(grid.x, grid.y);
+              float color = 1.0 - min(line, 1.0);
+              if (color < 0.1) discard;
 
-                // Pulse effect
-                float pulse = (sin(length(vPos) - time * 2.0) + 1.0) * 0.5;
-
-                vec3 finalColor = mix(color2, color1, alpha + pulse * 0.3 * alpha);
-                if (alpha < 0.1) discard; // Make it look like a wireframe
-
-                gl_FragColor = vec4(finalColor, 1.0);
+              // Dynamic color based on Distortion (Chaos)
+              vec3 baseColor = vec3(0.0, 0.949, 0.996); // 0x00f2fe
+              vec3 chaosColor = vec3(0.615, 0.305, 0.866); // Purple distortion
+              vec3 finalColor = mix(baseColor, chaosColor, abs(cogDistortion) * 0.5);
+              
+              gl_FragColor = vec4(finalColor, color * 0.5);
             }
-        `;
-
-        const gridGeo = new THREE.PlaneGeometry(30, 30, 60, 60); // High segment count for deformation
-        const gridMat = new THREE.ShaderMaterial({
-            uniforms: gridUniforms,
-            vertexShader: gridVertShader,
-            fragmentShader: gridFragShader,
-            transparent: true,
-            side: THREE.DoubleSide,
-            wireframe: false // Handled in fragment shader
+          `,
+          transparent: true,
+          wireframe: false,
+          side: THREE.DoubleSide,
         });
 
-        const gridMesh = new THREE.Mesh(gridGeo, gridMat);
-        gridMesh.rotation.x = -Math.PI / 2;
-        gridMesh.position.y = -2.5;
-        scene.add(gridMesh);
-        window.gridUniforms = gridUniforms; // Expose for update
+        const quantumGrid = new THREE.Mesh(gridGeo, window.quantumGridMaterial);
+        quantumGrid.position.y = -2.49; // Slightly above floor
+        scene.add(quantumGrid);
 
-        // Invisible Floor for rigid body collision (stays flat or updates on CPU if needed, we keep it simple for now)
-        const floorGeo = new THREE.PlaneGeometry(30, 30);
-        const floorMat = new THREE.MeshBasicMaterial({ visible: false });
+        // Floor for shadows and collision
+        const floorGeo = new THREE.PlaneGeometry(30, 30, 64, 64);
+        const floorMat = new THREE.MeshStandardMaterial({
+          color: 0x1e293b,
+          roughness: 0.8,
+          metalness: 0.2,
+        });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
-        floor.position.y = -2.5;
+        floor.position.y = -2.5; // base level before vertex displacement
+        floor.receiveShadow = true;
         scene.add(floor);
         window.floorMesh = floor;
 
@@ -1146,240 +796,58 @@ function init() {
           metalness: 0.8,
           roughness: 0.2,
         });
-
+        bouncingSphere = new THREE.Mesh(
+          new THREE.SphereGeometry(1.2, 32, 32),
+          sphereMat,
+        );
+        bouncingSphere.castShadow = true;
+        bouncingSphere.userData = {
+          velocity: new THREE.Vector3(0, 0, 0),
+          radius: 1.2,
+          mass: 1.0,
+          restitution: 0.8,
+        };
+        bouncingSphere.position.y = 5;
+        scene.add(bouncingSphere);
 
         // Module 2: GLSL Quantum Relativistic Particles
-
-        // Instanced Mesh for Quantum Particles (10000 instances)
-        const instanceCount = 10000;
-        const iGeo = new THREE.IcosahedronGeometry(0.1, 1);
-
-        // DataTexture setup
-        const format = (renderer.capabilities.isWebGL2) ? THREE.RedFormat : THREE.LuminanceFormat;
-        const audioDataArray = new Uint8Array(128);
-        audioDataTexture = new THREE.DataTexture(audioDataArray, 128, 1, format);
-        audioDataTexture.needsUpdate = true;
-
-        const iMat = new THREE.ShaderMaterial({
-            uniforms: {
-                time: { value: 0 },
-                color1: { value: new THREE.Color(0x0f172a) },
-                color2: { value: new THREE.Color(0x4facfe) },
-                audioTexture: { value: audioDataTexture },
-                curvature: { value: 0 },
-                distortion: { value: 0 },
-                gravity: { value: 9.81 },
-                uTurbulence: { value: 1.0 },
-                uVortexSpeed: { value: 1.0 },
-                uMousePos: { value: new THREE.Vector3() },
-                uAudioFrequency: { value: 440 }
-            },
-            vertexShader: `
-                uniform float time;
-                uniform float curvature;
-                uniform float distortion;
-                uniform float gravity;
-                uniform sampler2D audioTexture;
-                uniform float uTurbulence;
-                uniform float uVortexSpeed;
-                uniform vec3 uMousePos;
-                uniform float uAudioFrequency;
-
-                varying vec2 vUv;
-                varying vec3 vColor;
-
-                // Classic Perlin 3D Noise
-                vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
-                vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
-                vec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
-                float cnoise(vec3 P){
-                  vec3 Pi0 = floor(P);
-                  vec3 Pi1 = Pi0 + vec3(1.0);
-                  Pi0 = mod(Pi0, 289.0);
-                  Pi1 = mod(Pi1, 289.0);
-                  vec3 Pf0 = fract(P);
-                  vec3 Pf1 = Pf0 - vec3(1.0);
-                  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
-                  vec4 iy = vec4(Pi0.yy, Pi1.yy);
-                  vec4 iz0 = Pi0.zzzz;
-                  vec4 iz1 = Pi1.zzzz;
-                  vec4 ixy = permute(permute(ix) + iy);
-                  vec4 ixy0 = permute(ixy + iz0);
-                  vec4 ixy1 = permute(ixy + iz1);
-                  vec4 gx0 = ixy0 / 7.0;
-                  vec4 gy0 = fract(floor(gx0) / 7.0) - 0.5;
-                  gx0 = fract(gx0);
-                  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
-                  vec4 sz0 = step(gz0, vec4(0.0));
-                  gx0 -= sz0 * (step(0.0, gx0) - 0.5);
-                  gy0 -= sz0 * (step(0.0, gy0) - 0.5);
-                  vec4 gx1 = ixy1 / 7.0;
-                  vec4 gy1 = fract(floor(gx1) / 7.0) - 0.5;
-                  gx1 = fract(gx1);
-                  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
-                  vec4 sz1 = step(gz1, vec4(0.0));
-                  gx1 -= sz1 * (step(0.0, gx1) - 0.5);
-                  gy1 -= sz1 * (step(0.0, gy1) - 0.5);
-                  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);
-                  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);
-                  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);
-                  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);
-                  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);
-                  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);
-                  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);
-                  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);
-                  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));
-                  g000 *= norm0.x;
-                  g010 *= norm0.y;
-                  g100 *= norm0.z;
-                  g110 *= norm0.w;
-                  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));
-                  g001 *= norm1.x;
-                  g011 *= norm1.y;
-                  g101 *= norm1.z;
-                  g111 *= norm1.w;
-                  float n000 = dot(g000, Pf0);
-                  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));
-                  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));
-                  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));
-                  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));
-                  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));
-                  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));
-                  float n111 = dot(g111, Pf1);
-                  vec3 fade_xyz = fade(Pf0);
-                  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);
-                  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);
-                  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
-                  return 2.22 * n_xyz;
-                }
-
-                // 3D Curl Noise using 3 sampled noise values
-                vec3 curlNoise(vec3 p) {
-                    float e = 0.1;
-                    vec3 dx = vec3(e, 0.0, 0.0);
-                    vec3 dy = vec3(0.0, e, 0.0);
-                    vec3 dz = vec3(0.0, 0.0, e);
-
-                    float x0 = cnoise(p - dx);
-                    float x1 = cnoise(p + dx);
-                    float y0 = cnoise(p - dy);
-                    float y1 = cnoise(p + dy);
-                    float z0 = cnoise(p - dz);
-                    float z1 = cnoise(p + dz);
-
-                    float x = y1 - y0 - z1 + z0;
-                    float y = z1 - z0 - x1 + x0;
-                    float z = x1 - x0 - y1 + y0;
-
-                    return normalize(vec3(x, y, z)) * 2.0;
-                }
-
-                void main() {
-                    vUv = uv;
-
-                    // Transform position using instanceMatrix
-                    vec4 worldPos = instanceMatrix * vec4(position, 1.0);
-                    vec3 displacedPos = worldPos.xyz;
-
-                    // 1. Vortex Vector Field (Curl Noise & Rotation)
-                    // The vortex is driven by time, audio frequency, and gravity
-                    float vortexScale = (uAudioFrequency / 440.0) * uVortexSpeed * (gravity / 9.81);
-                    vec3 curl = curlNoise(displacedPos * 0.2 + time * 0.1) * uTurbulence;
-
-                    // Rotation around center (0,0,0) based on distance
-                    float distToCenterXZ = length(displacedPos.xz);
-                    float angle = time * vortexScale / max(distToCenterXZ, 1.0);
-                    float s = sin(angle);
-                    float c = cos(angle);
-                    mat2 rotXZ = mat2(c, -s, s, c);
-                    displacedPos.xz = rotXZ * displacedPos.xz;
-
-                    // Add turbulence displacement
-                    displacedPos += curl * 0.5;
-
-                    // Apply original topological distortion
-                    float noise = cnoise(displacedPos * 0.5 + time * 0.5);
-                    displacedPos += normal * noise * distortion * 0.5;
-
-                    // 2. Gravity Surface Flow (Pull towards center and curve downwards)
-                    float sink = exp(-distToCenterXZ * 0.5) * curvature * gravity;
-                    displacedPos.y -= sink;
-                    // Add an inward slide towards the gravity well
-                    vec2 dirToCenter = -normalize(displacedPos.xz + vec2(0.001));
-                    displacedPos.xz += dirToCenter * sink * 0.3 * (gravity / 9.81);
-
-                    // 3. Mouse Repulsion
-                    float distToMouse = distance(displacedPos, uMousePos);
-                    float repulsionRadius = 4.0;
-                    if(distToMouse < repulsionRadius) {
-                        vec3 repulseDir = normalize(displacedPos - uMousePos);
-                        float force = (repulsionRadius - distToMouse) / repulsionRadius;
-                        // Push outward and slightly upward
-                        displacedPos += repulseDir * force * 1.5;
-                        displacedPos.y += force * 0.5;
-                    }
-
-                    // Read audio texture based on instance ID
-                    float audioIndex = mod(float(gl_InstanceID), 128.0) / 128.0;
-                    vec4 audioData = texture2D(audioTexture, vec2(audioIndex, 0.5));
-                    float audioVal = audioData.r;
-
-                    // Pulse scale based on audio
-                    displacedPos += normal * audioVal * 0.5;
-
-                    // Map color based on height, audio, and curl
-                    vColor = vec3(0.5) + vec3(0.5) * cos(time + displacedPos.y * 2.0 + vec3(0,2,4)) + audioVal * 0.5;
-
-                    vec4 mvPosition = viewMatrix * vec4(displacedPos, 1.0);
-                    gl_Position = projectionMatrix * mvPosition;
-                }
-            `,
-            fragmentShader: `
-                uniform vec3 color1;
-                uniform vec3 color2;
-                varying vec2 vUv;
-                varying vec3 vColor;
-
-                void main() {
-                    gl_FragColor = vec4(mix(color1, vColor, 0.8), 0.9);
-                }
-            `,
-            transparent: true,
-            wireframe: true
+        const count = 5000;
+        const pGeo = new THREE.BufferGeometry();
+        const pos = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i++) pos[i] = (Math.random() - 0.5) * 16;
+        pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        const pMat = new THREE.PointsMaterial({
+          size: 0.08,
+          color: 0x4facfe,
+          transparent: true,
+          opacity: 0.85,
         });
+        quantumParticles = new THREE.Points(pGeo, pMat);
+        scene.add(quantumParticles);
 
-        quantumParticles = new THREE.InstancedMesh(iGeo, iMat, instanceCount);
-
-        // Setup initial instance matrices
-        const dummy = new THREE.Object3D();
-        for (let i = 0; i < instanceCount; i++) {
-            dummy.position.set(
-                (Math.random() - 0.5) * 40,
-                (Math.random() - 0.5) * 20,
-                (Math.random() - 0.5) * 40
-            );
-            dummy.rotation.set(
-                Math.random() * Math.PI,
-                Math.random() * Math.PI,
-                Math.random() * Math.PI
-            );
-            const scale = Math.random() * 0.5 + 0.1;
-            dummy.scale.set(scale, scale, scale);
-            dummy.updateMatrix();
-            quantumParticles.setMatrixAt(i, dummy.matrix);
+        // Module 3: 768d Vector Topology Graph
+        topologyLinesGroup = new THREE.Group();
+        scene.add(topologyLinesGroup);
+        const nodeMat = new THREE.MeshStandardMaterial({
+          color: 0x34d399,
+          emissive: 0x059669,
+        });
+        for (let i = 0; i < 14; i++) {
+          const n = new THREE.Mesh(
+            new THREE.SphereGeometry(0.3, 16, 16),
+            nodeMat,
+          );
+          n.position.set(
+            (Math.random() - 0.5) * 10,
+            (Math.random() - 0.5) * 6,
+            (Math.random() - 0.5) * 10,
+          );
+          n.userData = { baseY: n.position.y };
+          topologyNodes.push(n);
+          scene.add(n);
         }
 
-        quantumParticles.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        scene.add(quantumParticles);
-        window.instancedUniforms = iMat.uniforms;
-
-
         // Setup Sliders & Listeners
-      engineBus.on("UI_STATE_UPDATE", () => {
-          renderJSONState();
-      });
-
         document
           .getElementById("gravity-slider")
           .addEventListener("input", (e) => {
@@ -1403,9 +871,9 @@ function init() {
         document
           .getElementById("vector-slider")
           .addEventListener("input", (e) => {
-            GlobalState.topologyDistance = parseFloat(e.target.value);
+            GlobalState.vectorDensity = parseFloat(e.target.value);
             document.getElementById("vector-val").textContent =
-              GlobalState.topologyDistance.toFixed(1);
+              GlobalState.vectorDensity.toFixed(1);
             renderJSONState();
           });
 
@@ -1417,86 +885,95 @@ function init() {
               GlobalState.audioFrequency + " Hz";
             renderJSONState();
           });
-          document
-          .getElementById("bloom-slider")
-          ?.addEventListener("input", (e) => {
-            GlobalState.bloomStrength = parseFloat(e.target.value);
-            document.getElementById("bloom-val").innerText = GlobalState.bloomStrength.toFixed(1);
-            if (bloomPass) {
-                bloomPass.strength = GlobalState.bloomStrength;
-            }
-            renderJSONState();
-          });
 
+        // Module 5: 18-DoF Full-Body Humanoid Skeleton Rigging
+        const humanoidRig = new THREE.Group();
+        humanoidRig.position.set(-5, -1, 0);
 
+        const mat = new THREE.MeshStandardMaterial({ color: 0x8b5cf6, wireframe: true });
+        const jointMat = new THREE.MeshStandardMaterial({ color: 0x64748b });
 
-        document
-          .getElementById("turb-slider")
-          ?.addEventListener("input", (e) => {
-            GlobalState.turbulence = parseFloat(e.target.value);
-            document.getElementById("turb-val").innerText = GlobalState.turbulence.toFixed(1);
-            renderJSONState();
-          });
-        document
-          .getElementById("vortex-slider")
-          ?.addEventListener("input", (e) => {
-            GlobalState.vortexSpeed = parseFloat(e.target.value);
-            document.getElementById("vortex-val").innerText = GlobalState.vortexSpeed.toFixed(1);
-            renderJSONState();
-          });
+        function createBone(radius, length, name) {
+          const group = new THREE.Group();
+          group.name = name;
+          const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius*0.8, radius, length, 12), mat);
+          mesh.position.y = length / 2;
+          const joint = new THREE.Mesh(new THREE.SphereGeometry(radius*1.2, 12, 12), jointMat);
+          group.add(mesh);
+          group.add(joint);
+          return group;
+        }
 
+        // Spine
+        const spine = createBone(0.2, 1.5, "Spine");
 
-        document
-          .getElementById("bodies-slider")
-          ?.addEventListener("input", (e) => {
-            GlobalState.activeRigidBodies = parseInt(e.target.value);
-            document.getElementById("bodies-val").innerText = GlobalState.activeRigidBodies;
-            engineBus.emit("UPDATE_PHYSICS_POOL", GlobalState.activeRigidBodies);
-            renderJSONState();
-          });
-        document
-          .getElementById("restitution-slider")
-          ?.addEventListener("input", (e) => {
-            GlobalState.restitution = parseFloat(e.target.value);
-            document.getElementById("restitution-val").innerText = GlobalState.restitution.toFixed(2);
-            renderJSONState();
-          });
+        // Head
+        const head = new THREE.Group();
+        head.name = "Head";
+        head.position.y = 1.5;
+        const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 16), mat);
+        headMesh.position.y = 0.3;
+        head.add(headMesh);
+        spine.add(head);
 
-        // Module 5: Inverse Kinematics (IK) Robotic Arm (Robust Group Mesh)
-        const ikArmGroup = new THREE.Group();
-        ikArmGroup.position.set(-5, -2, 0);
+        // Shoulders
+        const leftShoulder = new THREE.Group();
+        leftShoulder.position.set(-0.4, 1.3, 0);
+        const rightShoulder = new THREE.Group();
+        rightShoulder.position.set(0.4, 1.3, 0);
+        spine.add(leftShoulder);
+        spine.add(rightShoulder);
 
-        const baseMesh = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.6, 0.8, 0.6, 16),
-          new THREE.MeshStandardMaterial({ color: 0x64748b }),
-        );
-        ikArmGroup.add(baseMesh);
+        // Arms (Upper & Lower)
+        const leftArm = createBone(0.12, 1.0, "LeftArm");
+        const rightArm = createBone(0.12, 1.0, "RightArm");
+        leftShoulder.add(leftArm);
+        rightShoulder.add(rightArm);
+        // Default pose
+        leftArm.rotation.z = Math.PI / 4;
+        rightArm.rotation.z = -Math.PI / 4;
 
-        const armBoneGroup = new THREE.Group();
-        armBoneGroup.position.set(0, 0.3, 0);
-        const upperArmMesh = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.25, 0.3, 2.5, 16),
-          new THREE.MeshStandardMaterial({ color: 0x8b5cf6, wireframe: true }),
-        );
-        upperArmMesh.position.y = 1.25;
-        armBoneGroup.add(upperArmMesh);
-        ikArmGroup.add(armBoneGroup);
+        const leftForearm = createBone(0.1, 1.0, "LeftForearm");
+        leftForearm.position.y = 1.0;
+        leftArm.add(leftForearm);
 
-        const forearmBoneGroup = new THREE.Group();
-        forearmBoneGroup.position.set(0, 2.5, 0);
-        const lowerArmMesh = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.18, 0.25, 2.2, 16),
-          new THREE.MeshStandardMaterial({ color: 0xa78bfa, wireframe: true }),
-        );
-        lowerArmMesh.position.y = 1.1;
-        forearmBoneGroup.add(lowerArmMesh);
-        armBoneGroup.add(forearmBoneGroup);
+        const rightForearm = createBone(0.1, 1.0, "RightForearm");
+        rightForearm.position.y = 1.0;
+        rightArm.add(rightForearm);
 
-        scene.add(ikArmGroup);
+        // Hips
+        const leftHip = new THREE.Group();
+        leftHip.position.set(-0.25, 0, 0);
+        const rightHip = new THREE.Group();
+        rightHip.position.set(0.25, 0, 0);
+        spine.add(leftHip);
+        spine.add(rightHip);
 
-        window.ikArm = ikArmGroup;
-        window.armBone = armBoneGroup;
-        window.forearmBone = forearmBoneGroup;
+        // Legs (Upper & Lower)
+        const leftLeg = createBone(0.15, 1.2, "LeftLeg");
+        const rightLeg = createBone(0.15, 1.2, "RightLeg");
+        // legs point down
+        leftLeg.rotation.z = Math.PI;
+        rightLeg.rotation.z = Math.PI;
+        leftHip.add(leftLeg);
+        rightHip.add(rightLeg);
+
+        const leftCalf = createBone(0.12, 1.2, "LeftCalf");
+        leftCalf.position.y = 1.2;
+        leftLeg.add(leftCalf);
+
+        const rightCalf = createBone(0.12, 1.2, "RightCalf");
+        rightCalf.position.y = 1.2;
+        rightLeg.add(rightCalf);
+
+        humanoidRig.add(spine);
+        scene.add(humanoidRig);
+        window.humanoidRig = humanoidRig;
+
+        // Cache references for procedural kinematics
+        window.humanoidBones = {
+          spine, head, leftArm, rightArm, leftForearm, rightForearm, leftLeg, rightLeg, leftCalf, rightCalf
+        };
 
         // Module 6: Soft-Body Deformation Mesh
         const softGeo = new THREE.PlaneGeometry(12, 12, 32, 32);
@@ -1524,9 +1001,26 @@ function init() {
           transparent: true,
           opacity:
             0.1 +
-            GlobalState.topologyDistance * 0.02 +
+            GlobalState.vectorDensity * 0.02 +
             (GlobalState.audioFrequency / 1000) * 0.2,
         });
+
+        const threshold = GlobalState.vectorDensity / Math.max(1.0, 1.0 + CognitionCore.density);
+
+        for (let i = 0; i < topologyNodes.length; i++) {
+          for (let j = i + 1; j < topologyNodes.length; j++) {
+            if (
+              topologyNodes[i].position.distanceTo(topologyNodes[j].position) <
+              threshold
+            ) {
+              const lGeo = new THREE.BufferGeometry().setFromPoints([
+                topologyNodes[i].position,
+                topologyNodes[j].position,
+              ]);
+              topologyLinesGroup.add(new THREE.Line(lGeo, lineMat));
+            }
+          }
+        }
       }
 
       // --- 8. Web Audio API Real-Time Microphone & FFT Analyzer Engine ---
@@ -1537,7 +1031,6 @@ function init() {
       let isMicActive = false;
       let isToneActive = false;
       let fftDataArray = new Uint8Array(64);
-      let audioDataTexture = null;
 
       window.toggleMicrophone = async function () {
         const btnText = document.getElementById("mic-status-text");
@@ -1621,12 +1114,56 @@ function init() {
         return dot / (Math.sqrt(normA) * Math.sqrt(normB) + 1e-9);
       };
 
+      function getCurvatureDepthAt(x, z, gravity, solarAngle, time, cogCurvature) {
+        const dist = Math.sqrt(x * x + z * z);
+        const curveDepth = (gravity - 9.81) * 0.05 + cogCurvature;
+        let y = -2.5; // floor base
+        y -= curveDepth * Math.exp(-dist * 0.2) * 5.0; // Gravity well
+        const solarRad = (solarAngle / 24.0) * Math.PI * 2.0;
+        y += Math.cos(x * 0.5 + time + solarRad) * 0.2;
+        return Math.max(-10.0, Math.min(y, 10.0));
+      }
+
+      function exportTelemetry(bones) {
+        if (!window.telemetryOutput) {
+          window.telemetryOutput = document.createElement('div');
+          window.telemetryOutput.style.position = 'absolute';
+          window.telemetryOutput.style.bottom = '10px';
+          window.telemetryOutput.style.left = '10px';
+          window.telemetryOutput.style.color = '#00f2fe';
+          window.telemetryOutput.style.fontFamily = 'monospace';
+          window.telemetryOutput.style.fontSize = '12px';
+          window.telemetryOutput.style.pointerEvents = 'none';
+          document.body.appendChild(window.telemetryOutput);
+        }
+
+        // Construct 18-DoF state matrix (Euler angles)
+        const telemetryData = {
+          timestamp: Date.now(),
+          spine: [bones.spine.rotation.x, bones.spine.rotation.y, bones.spine.rotation.z],
+          head: [bones.head.rotation.x, bones.head.rotation.y, bones.head.rotation.z],
+          leftArm: [bones.leftArm.rotation.x, bones.leftArm.rotation.y, bones.leftArm.rotation.z],
+          rightArm: [bones.rightArm.rotation.x, bones.rightArm.rotation.y, bones.rightArm.rotation.z],
+          leftForearm: [bones.leftForearm.rotation.x, 0, 0],
+          rightForearm: [bones.rightForearm.rotation.x, 0, 0],
+          leftLeg: [bones.leftLeg.rotation.x, bones.leftLeg.rotation.y, bones.leftLeg.rotation.z],
+          rightLeg: [bones.rightLeg.rotation.x, bones.rightLeg.rotation.y, bones.rightLeg.rotation.z],
+          leftCalf: [bones.leftCalf.rotation.x, 0, 0],
+          rightCalf: [bones.rightCalf.rotation.x, 0, 0]
+        };
+
+        // Output to DOM for visualization; in production this maps to polyglot_3d_engine/telemetry.py
+        window.telemetryOutput.innerText = "TELEM (18-DoF): " + JSON.stringify(telemetryData);
+
+        // Fetch API is mocked for Phase 5.2 telemetry to polyglot_3d_engine/telemetry.py (simulated as POST to /telemetry)
+        fetch('/telemetry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(telemetryData)
+        }).catch(() => {});
+      }
+
       function animate() {
-        const now = Date.now();
-        const time = now * 0.001;
-        const dt = Math.min((now - lastTime) * 0.001, 0.1);
-        lastTime = now;
-        GlobalState.time = time;
         // Dynamic iframe canvas size check to prevent 0x0 pixel black screen
         if (renderer && camera && canvas) {
           const targetW = canvas.parentElement
@@ -1648,51 +1185,14 @@ function init() {
 
         controls.update();
 
-
-        // Raycaster logic for uMousePos
-        raycaster.setFromCamera(mouse, camera);
-        raycaster.ray.intersectPlane(intersectionPlane, uMousePos);
-
-        // Pass Topology Data to Shaders
-        if (typeof topoCore !== 'undefined') {
-            if (window.gridUniforms) {
-                window.gridUniforms.time.value = time;
-                window.gridUniforms.curvature.value = topoCore.curvature;
-                window.gridUniforms.distortion.value = topoCore.distortion;
-            }
-            if (window.instancedUniforms) {
-                window.instancedUniforms.time.value = time;
-                window.instancedUniforms.curvature.value = topoCore.curvature;
-                window.instancedUniforms.distortion.value = topoCore.distortion;
-
-                // Phase 3 additions
-                window.instancedUniforms.uTurbulence.value = GlobalState.turbulence;
-                window.instancedUniforms.uVortexSpeed.value = GlobalState.vortexSpeed;
-                window.instancedUniforms.uMousePos.value.copy(uMousePos);
-                window.instancedUniforms.uAudioFrequency.value = GlobalState.audioFrequency;
-                window.instancedUniforms.gravity.value = GlobalState.gravity;
-            }
-        }
-
-        // Update Audio DataTexture
-        if (audioDataTexture) {
-            audioDataTexture.needsUpdate = true;
-        }
-
+        const now = Date.now();
+        const time = now * 0.001;
+        const dt = Math.min((now - lastTime) * 0.001, 0.1);
 
         // Fetch Live Web Audio FFT Spectrum Frequency with Noise Gate & Scale Pulse
         let currentAmp = 0.0;
         if (analyserNode && isMicActive) {
           analyserNode.getByteFrequencyData(fftDataArray);
-
-          if (audioDataTexture) {
-              const data = audioDataTexture.image.data;
-              for (let i = 0; i < Math.min(128, fftDataArray.length); i++) {
-                  data[i] = fftDataArray[i];
-              }
-              audioDataTexture.needsUpdate = true;
-          }
-
           let sum = 0;
           for (let i = 0; i < fftDataArray.length; i++) sum += fftDataArray[i];
           const rawAvg = sum / fftDataArray.length; // Range 0 ~ 255
@@ -1718,30 +1218,182 @@ function init() {
 
         lastTime = now;
 
-        engineCore.tick(dt, GlobalState);
+        // 1. C++ Gravity Bouncing Simulation (Rigid Body Physics)
+        // TICK: Topological Cognition Core (Autonomous Chaos Math)
+        CognitionCore.update(dt);
+        
+        // Feed Tensors to Shader Uniforms
+        if (window.quantumGridMaterial) {
+          window.quantumGridMaterial.uniforms.time.value = time;
+          window.quantumGridMaterial.uniforms.gravity.value = GlobalState.gravity;
+          window.quantumGridMaterial.uniforms.solarAngle.value = GlobalState.solarAngle;
+          window.quantumGridMaterial.uniforms.cogCurvature.value = CognitionCore.curvature;
+          window.quantumGridMaterial.uniforms.cogDensity.value = CognitionCore.density;
+          window.quantumGridMaterial.uniforms.cogDistortion.value = CognitionCore.distortion;
+        }
 
-        // Advanced Solar Matrix Optics
+        // Deform Physical Floor Mesh to match shader visual curvature
+        if (window.floorMesh && window.floorMesh.geometry) {
+          const posAttribute = window.floorMesh.geometry.attributes.position;
+          // Local space deformation since PlaneGeometry is rotated X -90 deg
+          // Original plane is on XY before rotation. After rotation, its local Z acts as world -Y
+          for (let i = 0; i < posAttribute.count; i++) {
+             // Extract local coords
+             const lx = posAttribute.getX(i);
+             const ly = posAttribute.getY(i);
+             // Since plane is rotated -90 deg on X:
+             // World X = lx
+             // World Z = -ly
+             const wx = lx;
+             const wz = -ly;
+             const curveY = getCurvatureDepthAt(wx, wz, GlobalState.gravity, GlobalState.solarAngle, time, CognitionCore.curvature);
+             // Map world Y back to local Z
+             const lz = curveY - (-2.5); // base is -2.5
+             posAttribute.setZ(i, lz);
+          }
+          posAttribute.needsUpdate = true;
+          window.floorMesh.geometry.computeVertexNormals();
+        }
+
+        // Update Cognitive UI HUD
+        const curEl = document.getElementById('cog-curvature');
+        if (curEl) curEl.innerText = CognitionCore.curvature.toFixed(3);
+        const denEl = document.getElementById('cog-density');
+        if (denEl) denEl.innerText = CognitionCore.density.toFixed(3);
+        const distEl = document.getElementById('cog-distortion');
+        if (distEl) distEl.innerText = CognitionCore.distortion.toFixed(3);
+
+        const rb = bouncingSphere.userData;
+
+        // Apply gravity
+        rb.velocity.y -= GlobalState.gravity * dt;
+
+        // Update position
+        bouncingSphere.position.addScaledVector(rb.velocity, dt);
+
+        // 2. Solar Angle Thermal Expansion + Audio Scale Pulse ("팡팡 부풀어오름")
+        const thermalScale = physics.applyThermalExpansion(
+          GlobalState.solarAngle,
+          1.0,
+        );
+        const pulseBoost = isMicActive
+          ? currentAmp * 1.5
+          : ((GlobalState.audioFrequency - 100) / 900) * 0.5;
+        const finalScale = thermalScale + pulseBoost;
+        bouncingSphere.scale.set(finalScale, finalScale, finalScale);
+
+        if (quantumParticles) {
+          const particlePulse = 1.0 + pulseBoost * 0.8;
+          quantumParticles.scale.set(
+            particlePulse,
+            particlePulse,
+            particlePulse,
+          );
+        }
+
+        // AABB Collision with floor
+        const currentRadius = rb.radius * finalScale;
+        const floorY = getCurvatureDepthAt(bouncingSphere.position.x, bouncingSphere.position.z, GlobalState.gravity, GlobalState.solarAngle, time, CognitionCore.curvature);
+        if (
+          bouncingSphere.position.y - currentRadius <= floorY
+        ) {
+          bouncingSphere.position.y = floorY + currentRadius;
+          rb.velocity.y = Math.abs(rb.velocity.y) * rb.restitution;
+        }
+
+        const solarRad = (GlobalState.solarAngle / 24.0) * Math.PI * 2;
         if (mainLight) {
-            const solarData = calculateSolarMatrix(GlobalState.solarAngle, 2.0);
-            mainLight.position.set(solarData.x, solarData.y, solarData.z);
-            mainLight.intensity = solarData.intensity;
+          mainLight.position.set(
+            Math.cos(solarRad) * 15,
+            Math.sin(solarRad) * 15,
+            10,
+          );
+        }
 
-            // Link to grid colors
-            if (window.gridUniforms) {
-                window.gridUniforms.color1.value.setHex(solarData.colorHex);
-            }
+        // 3. Quantum Particles Vortices
+        if (quantumParticles) {
+          // Apply density and distortion (Phase 6.1 & 6.2)
+          // Defensive clamping applied to prevent infinity or crash
+          const safeDensity = Math.max(0.0, Math.min(CognitionCore.density, 10.0));
+          const safeDistortion = Math.max(0.0, Math.min(CognitionCore.distortion, 5.0));
+
+          const densityClamp = Math.max(0.1, 1.0 - safeDensity);
+          const distortionJitter = Math.sin(time * 10.0) * Math.min(safeDistortion, 2.0);
+
+          quantumParticles.rotation.y =
+            time *
+            0.2 *
+            (GlobalState.audioFrequency / 440) *
+            (9.81 / Math.max(GlobalState.gravity, 0.1)) + distortionJitter;
+
+          const baseScale = 1.0 + (GlobalState.gravity - 9.81) * 0.05;
+          quantumParticles.scale.setScalar(
+            Math.max(0.1, Math.min(baseScale * densityClamp, 5.0))
+          );
+
+          if (quantumParticles.material) {
+            quantumParticles.material.color.setHSL(
+              (GlobalState.solarAngle / 24.0 + 0.5) % 1.0,
+              1.0,
+              0.5,
+            );
+          }
         }
 
         // 4. Vector Topology Update
-        /* Replaced by InstancedMesh Shader Logic */
-        if (topologyLinesGroup) {
-            topologyLinesGroup.clear();
-        }
-
+        topologyNodes.forEach(
+          (n) => {
+            const safeDistortion = Math.max(0.0, Math.min(CognitionCore.distortion, 5.0));
+            const distortionOffset = Math.sin(n.position.x * 0.5 + time * 2.0) * Math.min(safeDistortion, 3.0);
+            n.position.y = n.userData.baseY + (9.81 - GlobalState.gravity) * 0.2 + distortionOffset;
+          }
+        );
         if (topologyLinesGroup) {
           topologyLinesGroup.position.y = (9.81 - GlobalState.gravity) * 0.2;
         }
 
+        // Procedural Kinematics for 18-DoF Humanoid
+        if (window.humanoidRig && window.humanoidBones) {
+          // Map Base to curvature depth
+          window.humanoidRig.position.y = getCurvatureDepthAt(window.humanoidRig.position.x, window.humanoidRig.position.z, GlobalState.gravity, GlobalState.solarAngle, time, CognitionCore.curvature) + 2.5;
+
+          const bones = window.humanoidBones;
+
+          // Spine sway based on time, gravity, and distortion
+          const gravitySway = (9.81 - GlobalState.gravity) * 0.05;
+          bones.spine.rotation.x = Math.sin(time * 2) * 0.1 + gravitySway;
+          bones.spine.rotation.z = Math.cos(time * 1.5) * 0.1 + Math.min(CognitionCore.distortion, 5.0) * 0.1;
+
+          // Head looks at bouncing sphere
+          const targetPos = bouncingSphere.position.clone();
+          // Convert target to head local space
+          const headWorldPos = new THREE.Vector3();
+          bones.head.getWorldPosition(headWorldPos);
+          // simple lookAt logic
+          const dir = targetPos.sub(headWorldPos).normalize();
+          bones.head.rotation.y = Math.atan2(dir.x, dir.z);
+          bones.head.rotation.x = Math.asin(-dir.y);
+
+          // Arms procedural wave based on audio freq & time
+          const armWave = Math.sin(time * 5 + GlobalState.audioFrequency / 100) * 0.5;
+          bones.leftArm.rotation.z = Math.PI / 4 + armWave;
+          bones.rightArm.rotation.z = -Math.PI / 4 - armWave;
+          bones.leftArm.rotation.x = Math.cos(time * 3) * 0.5;
+          bones.rightArm.rotation.x = Math.sin(time * 3) * 0.5;
+
+          bones.leftForearm.rotation.x = Math.abs(Math.sin(time * 4)) * 1.5;
+          bones.rightForearm.rotation.x = Math.abs(Math.cos(time * 4)) * 1.5;
+
+          // Legs walk cycle based on gravity and time
+          const walkSpeed = time * 4 * (GlobalState.gravity / 9.81);
+          bones.leftLeg.rotation.x = Math.sin(walkSpeed) * 0.5;
+          bones.rightLeg.rotation.x = Math.sin(walkSpeed + Math.PI) * 0.5;
+          bones.leftCalf.rotation.x = Math.abs(Math.sin(walkSpeed)) * -1.0;
+          bones.rightCalf.rotation.x = Math.abs(Math.sin(walkSpeed + Math.PI)) * -1.0;
+
+          // Export Telemetry
+          exportTelemetry(bones);
+        }
 
         // Soft-Body Deformation
         if (window.softBodyMesh) {
@@ -1761,35 +1413,12 @@ function init() {
           pos.needsUpdate = true;
         }
 
-        // updateTopologyLines();
+        updateTopologyLines();
 
-        composer.render();
+        renderer.render(scene, camera);
       }
 
-            function calculateSolarMatrix(angle, baseIntensity) {
-          const rad = (angle / 24.0) * Math.PI * 2;
-          const zenithDeg = rad * 180 / Math.PI;
-
-          let airMass = 1.0;
-          if (93.885 - zenithDeg > 0) {
-              airMass = 1.0 / (Math.cos(rad) + 0.15 * Math.pow(93.885 - zenithDeg, -1.253));
-          } else {
-              airMass = 40.0;
-          }
-
-          let intensity = Math.max(0.1, baseIntensity * Math.sin(rad) * (1.0 / Math.abs(airMass)));
-          if (isNaN(intensity) || !isFinite(intensity)) intensity = 0.1;
-
-          return {
-              x: Math.cos(rad) * 15,
-              y: Math.sin(rad) * 15,
-              z: 10,
-              intensity: intensity,
-              colorHex: rad > Math.PI ? 0x0f172a : 0x4facfe // Night vs Day basic blend
-          };
-      }
-
-            function onWindowResize() {
+      function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         const initW = Math.max(
@@ -1801,8 +1430,6 @@ function init() {
           window.innerHeight || canvas.clientHeight || 600,
         );
         renderer.setSize(initW, initH);
-        if (typeof composer !== 'undefined' && composer) composer.setSize(initW, initH);
-        if (typeof bloomPass !== 'undefined' && bloomPass) bloomPass.resolution.set(initW, initH);
       }
 
       // Fail-Safe Immediate & Event-Based 3D Engine Initialization Hook
@@ -1816,146 +1443,5 @@ function init() {
         window.addEventListener("load", init);
       }
     </script>
-  
-
-<style>
-.publisher-guide {
-  max-width: 1000px;
-  margin: 3rem auto;
-  padding: 2.5rem;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 16px;
-  color: #cbd5e1;
-  line-height: 1.8;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-}
-.publisher-guide h2 {
-  color: #38bdf8;
-  font-size: 1.8rem;
-  border-bottom: 2px solid #334155;
-  padding-bottom: 0.75rem;
-  margin-top: 2rem;
-  margin-bottom: 1.25rem;
-}
-.publisher-guide h3 {
-  color: #f1f5f9;
-  font-size: 1.3rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-}
-.publisher-guide p {
-  margin-bottom: 1.25rem;
-  font-size: 1.05rem;
-}
-.publisher-guide ul, .publisher-guide ol {
-  margin-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-.publisher-guide li {
-  margin-bottom: 0.5rem;
-}
-.publisher-guide code {
-  background: #0f172a;
-  color: #38bdf8;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-family: monospace;
-}
-.publisher-guide .faq-card {
-  background: #0f172a;
-  padding: 1.25rem;
-  border-radius: 8px;
-  border-left: 4px solid #38bdf8;
-  margin-bottom: 1rem;
-}
-.publisher-guide .faq-card h4 {
-  color: #f8fafc;
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-}
-.adsense-container {
-  margin: 2.5rem 0;
-  text-align: center;
-  background: #0f172a;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px dashed #334155;
-}
-</style>
-
-<article class="publisher-guide">
-  <h2>Comprehensive Engineering Guide & Technical Documentation for Jules Master 3D Spatial Engine V1 2</h2>
-  
-  <p>Welcome to <strong>SA Labs Jules Master 3D Spatial Engine V1 2</strong>, a state-of-the-art web utility designed for modern software engineers, digital creators, audio engineers, and web developers. This interactive workstation leverages high-performance browser Web APIs, client-side WebAssembly, and real-time canvas rendering engines to provide instantaneous, zero-latency execution directly within your browser window without transmitting sensitive data to third-party servers.</p>
-  
-  
-<div class="adsense-container">
-  <!-- SA Labs High-Value Publisher Content Ad Unit -->
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-9108438313531011"
-       data-ad-slot="auto"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-</div>
-
-
-  <h2>Key Features & Technical Architecture</h2>
-  <p>Our platform incorporates enterprise-grade architectural patterns to ensure reliability, security, and exceptional performance across desktop and mobile devices. Key technical highlights include:</p>
-  <ul>
-    <li><strong>Client-Side Local Computation:</strong> All input parameters and dynamic operations are processed locally via WebAssembly and modern JavaScript engines, guaranteeing 100% data privacy.</li>
-    <li><strong>Adaptive High-DPI Rendering:</strong> Visual elements dynamically scale to match device pixel ratios, delivering crisp graphics on 4K and Retina displays.</li>
-    <li><strong>Standard Compliance:</strong> Built strictly according to modern W3C standards, ECMAScript 2026 specifications, and HTML5 Web API guidelines.</li>
-    <li><strong>Zero External Dependencies:</strong> Optimized for ultra-fast initial page load times and minimal memory footprints.</li>
-  </ul>
-
-  <h2>Step-by-Step Operating Instructions</h2>
-  <p>To maximize your productivity when using Jules Master 3D Spatial Engine V1 2, follow these recommended operational workflows:</p>
-  <ol>
-    <li><strong>Configuration & Inputs:</strong> Utilize the top control panel to specify target parameters, input strings, frequency values, or configuration modes.</li>
-    <li><strong>Real-Time Execution:</strong> As you adjust controls or trigger actions, the engine dynamically recalculates outputs in real time without requiring full page reloads.</li>
-    <li><strong>Export & Integration:</strong> Copy generated data, download processed media assets, or integrate exported JSON schemas directly into your development workflow.</li>
-  </ol>
-
-  <h2>Frequently Asked Questions (FAQ)</h2>
-  <div class="faq-card">
-    <h4>Q1: Is my data uploaded or stored on SA Labs cloud servers?</h4>
-    <p>No. All calculations, audio synthesis, text processing, and data transformations performed by Jules Master 3D Spatial Engine V1 2 occur entirely within your local browser sandbox. No input data is sent to external servers.</p>
-  </div>
-  
-  <div class="faq-card">
-    <h4>Q2: Which browsers are supported for maximum performance?</h4>
-    <p>Jules Master 3D Spatial Engine V1 2 is fully compatible with all modern evergreen browsers, including Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge, and modern mobile browsers.</p>
-  </div>
-
-  <div class="faq-card">
-    <h4>Q3: Can I use SA Labs tools for commercial software development projects?</h4>
-    <p>Yes. All tools, utilities, generated code, and assets produced on the SA Labs platform are free for both personal and commercial engineering use.</p>
-  </div>
-
-  
-<div class="adsense-container">
-  <!-- SA Labs High-Value Publisher Content Ad Unit -->
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-9108438313531011"
-       data-ad-slot="auto"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-</div>
-
-
-  <h2>About SA Labs Open-Source Technology Architecture</h2>
-  <p>SA Labs (Sequence Autonomic Laboratories) is dedicated to advancing web architecture, real-time 3D graphics engines, static program analysis (SAPQ), and developer productivity tools. Explore our GitHub repositories and official documentation to learn more about our open-source initiatives and enterprise frameworks.</p>
-</article>
-
-</body>
+  </body>
 </html>

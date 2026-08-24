@@ -9,11 +9,13 @@ try:
     from .sapq_checkpoint import CheckpointManager
     from .sapq_logger import SAPQLogger
     from .sapq_ast_parser import ASTParser
+    from .sapq_security_guard import SAPQSecurityGuard
 except (ImportError, ValueError):
     from sapq_preflight import SAPQPreflightGuard
     from sapq_checkpoint import CheckpointManager
     from sapq_logger import SAPQLogger
     from sapq_ast_parser import ASTParser
+    from sapq_security_guard import SAPQSecurityGuard
 
 sys.stdout.reconfigure(encoding='utf-8')
 
@@ -326,6 +328,13 @@ def audit_file(filepath, session_id=None, baseline_filepath=None, audit_only=Fal
         if runtime_errors:
             report["runtime_console_errors"] = runtime_errors
 
+    # Phase 25.0: AST Taint & Security Smell Scanner
+    ast_parser = ASTParser(filepath)
+    security_guard = SAPQSecurityGuard(filepath, ast_parser)
+    security_report = security_guard.analyze()
+    report["security_guard_issues"] = security_report["issues"]
+    report["security_health_score"] = security_report["security_health_score"]
+
     # Recalculate score based on all unified detections
     deductions = 0
     deductions += len(report.get("discontinuities_detected", [])) * 10
@@ -365,7 +374,11 @@ def audit_file(filepath, session_id=None, baseline_filepath=None, audit_only=Fal
         len(report.get("async_timing_contradictions", [])) * 15 +
         len(report.get("intent_mismatches", [])) * 20
     )
-    report["audit_integrity_score"] = max(0, 100 - total_penalty)
+
+    # Calculate security deductions based on the Security Guard report
+    security_deduction = 100 - report.get("security_health_score", 100)
+
+    report["audit_integrity_score"] = max(0, 100 - total_penalty - security_deduction)
 
     # Inject Preflight results into report
     report["preflight_status"] = "PASSED"

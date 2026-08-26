@@ -1,5 +1,91 @@
 import re
 import os
+import math
+import numpy as np
+
+class TaintNode:
+    def __init__(self, node_id, file_path, line, col, is_source=False, is_sink=False, severity=0.0):
+        self.node_id = node_id
+        self.file_path = file_path
+        self.line = line
+        self.col = col
+        self.is_source = is_source
+        self.is_sink = is_sink
+        self.severity = severity  # S-axis value
+        self.in_edges = []
+        self.out_edges = []
+
+class TaintEdge:
+    def __init__(self, src_node, dst_node, edge_type="direct", complexity=1.0):
+        self.src_node = src_node
+        self.dst_node = dst_node
+        self.edge_type = edge_type  # e.g., "first-party", "third-party"
+        self.complexity = complexity  # C-axis increment value
+
+class PyFlowTaintAnalyzer:
+    def __init__(self, alpha_security=0.015):
+        self.nodes = {}
+        self.alpha_security = alpha_security
+
+    def add_node(self, node_id, file_path, line, col, is_source=False, is_sink=False, severity=0.0):
+        node = TaintNode(node_id, file_path, line, col, is_source, is_sink, severity)
+        self.nodes[node_id] = node
+        return node
+
+    def add_edge(self, src_id, dst_id, edge_type="direct", complexity=1.0):
+        if src_id in self.nodes and dst_id in self.nodes:
+            src = self.nodes[src_id]
+            dst = self.nodes[dst_id]
+            edge = TaintEdge(src, dst, edge_type, complexity)
+            src.out_edges.append(edge)
+            dst.in_edges.append(edge)
+
+    def run_ticr_analysis(self):
+        """
+        Execute Taint-Informed Callee Resolution (TICR)
+        Identify security-relevant flows from sources to sinks.
+        """
+        sources = [n for n in self.nodes.values() if n.is_source]
+        sinks = [n for n in self.nodes.values() if n.is_sink]
+
+        valid_paths = []
+
+        # Simple DFS path extraction for simulation of IFDS reachability
+        def dfs(curr_node, path, accum_complexity):
+            if curr_node.is_sink:
+                valid_paths.append((list(path), accum_complexity))
+                return
+            for edge in curr_node.out_edges:
+                next_node = edge.dst_node
+                if next_node not in path:
+                    path.append(next_node)
+                    dfs(next_node, path, accum_complexity + edge.complexity)
+                    path.pop()
+
+        for src in sources:
+            dfs(src, [src], 0.0)
+
+        return valid_paths
+
+    def calculate_security_health_score(self, valid_paths):
+        """
+        Calculate Security Health Score (SHS) using multi-axis exponential decay
+        """
+        if not valid_paths:
+            return 100.0  # Perfect Score
+
+        impact_sum = 0.0
+        for path, complexity in valid_paths:
+            severity = path[0].severity  # Severity index of the source
+            hop_depth = len(path) - 1   # Total segments in the path (D-axis)
+
+            # S * D * C
+            path_impact = severity * hop_depth * complexity
+            impact_sum += path_impact
+
+        shs = 100.0 * math.exp(-self.alpha_security * impact_sum)
+        return max(0.0, min(100.0, shs))
+
 
 class SAPQSecurityGuard:
     """
@@ -135,6 +221,26 @@ class SAPQSecurityGuard:
 
         self.ast_parser._traverse(self.ast_parser.ast, visitor)
 
+        analyzer = PyFlowTaintAnalyzer()
+        for name, info in tainted_vars.items():
+            analyzer.add_node(name, self.filepath, info['line'], 0, is_source=True, severity=1.0)
+        for sink in self.sinks:
+            analyzer.add_node(sink, self.filepath, 0, 0, is_sink=True, severity=1.0)
+
+        for issue in self.issues:
+            if issue['type'] == "UNSANITIZED_DATA_FLOW":
+                match = re.search(r"via variable '([^']+)'", issue['details'])
+                if match:
+                    var_name = match.group(1)
+                    sink_match = re.search(r"into sink '([^']+)'", issue['details'])
+                    if sink_match:
+                        sink_name = sink_match.group(1)
+                        if var_name in analyzer.nodes and sink_name in analyzer.nodes:
+                            analyzer.add_edge(var_name, sink_name)
+
+        paths = analyzer.run_ticr_analysis()
+        self.security_health_score = analyzer.calculate_security_health_score(paths) if paths else 100.0
+
     def _analyze_python(self):
         import ast as pyast
         tainted_vars = {}
@@ -194,6 +300,26 @@ class SAPQSecurityGuard:
 
         SecurityVisitor(self).visit(self.ast_parser.ast)
 
+        analyzer = PyFlowTaintAnalyzer()
+        for name, info in tainted_vars.items():
+            analyzer.add_node(name, self.filepath, info['line'], 0, is_source=True, severity=1.0)
+        for sink in self.sinks:
+            analyzer.add_node(sink, self.filepath, 0, 0, is_sink=True, severity=1.0)
+
+        for issue in self.issues:
+            if issue['type'] == "UNSANITIZED_DATA_FLOW":
+                match = re.search(r"via variable '([^']+)'", issue['details'])
+                if match:
+                    var_name = match.group(1)
+                    sink_match = re.search(r"into sink '([^']+)'", issue['details'])
+                    if sink_match:
+                        sink_name = sink_match.group(1)
+                        if var_name in analyzer.nodes and sink_name in analyzer.nodes:
+                            analyzer.add_edge(var_name, sink_name)
+
+        paths = analyzer.run_ticr_analysis()
+        self.security_health_score = analyzer.calculate_security_health_score(paths) if paths else 100.0
+
     def _get_source_name(self, node):
         if not node: return ""
         if node.type == 'MemberExpression':
@@ -248,8 +374,11 @@ class SAPQSecurityGuard:
         return ""
 
     def _generate_report(self):
-        score = 100 - (self.unsanitized_flows * 15) - (self.hardcoded_credentials * 10) - (self.other_smells * 5)
-        score = max(0, score)
+        if hasattr(self, 'security_health_score'):
+            score = self.security_health_score
+        else:
+            score = 100 - (self.unsanitized_flows * 15) - (self.hardcoded_credentials * 10) - (self.other_smells * 5)
+            score = max(0, score)
 
         return {
             "security_health_score": score,
